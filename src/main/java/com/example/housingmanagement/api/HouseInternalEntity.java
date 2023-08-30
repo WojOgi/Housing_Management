@@ -2,8 +2,6 @@ package com.example.housingmanagement.api;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
 public class HouseInternalEntity {
 
@@ -15,7 +13,7 @@ public class HouseInternalEntity {
     private String houseNumber;
 
     private int maxCapacity;
-    private int currentCapacity;
+    private int currentOccupancy;
 
     public HouseInternalEntity(String houseNumber) {
         this.houseNumber = houseNumber;
@@ -24,17 +22,17 @@ public class HouseInternalEntity {
     public HouseInternalEntity() {
     }
 
-    public HouseInternalEntity(int id, String houseNumber, int maxCapacity, int currentCapacity) {
+    public HouseInternalEntity(int id, String houseNumber, int maxCapacity, int currentOccupancy) {
         this.id = id;
         this.houseNumber = houseNumber;
         this.maxCapacity = maxCapacity;
-        this.currentCapacity = currentCapacity;
+        this.currentOccupancy = currentOccupancy;
     }
 
-    public HouseInternalEntity(String houseNumber, int maxCapacity, int currentCapacity) {
+    public HouseInternalEntity(String houseNumber, int maxCapacity, int currentOccupancy) {
         this.houseNumber = houseNumber;
         this.maxCapacity = maxCapacity;
-        this.currentCapacity = currentCapacity;
+        this.currentOccupancy = currentOccupancy;
     }
 
     public int getId() {
@@ -57,12 +55,12 @@ public class HouseInternalEntity {
         this.maxCapacity = maxCapacity;
     }
 
-    public int getCurrentCapacity() {
-        return currentCapacity;
+    public int getCurrentOccupancy() {
+        return currentOccupancy;
     }
 
-    public void setCurrentCapacity(int currentCapacity) {
-        this.currentCapacity = currentCapacity;
+    public void setCurrentOccupancy(int currentCapacity) {
+        this.currentOccupancy = currentCapacity;
     }
 
     @Override

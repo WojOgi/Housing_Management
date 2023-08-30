@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,16 +56,12 @@ public class H2Repository implements HousingDatabaseInterface {
 
     @Override
     public int houseCurrentCapacity(HouseRequest houseRequest) {
-        return houseRepository.findById(identifyHouseInDatabaseByAddress(houseRequest)).get().getCurrentCapacity();
+        return houseRepository.findById(identifyHouseInDatabaseByAddress(houseRequest)).get().getCurrentOccupancy();
     }
 
     @Override
     public boolean existsByHouse(HouseRequest houseRequest) {
-        if (identifyHouseInDatabaseByAddress(houseRequest) > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return identifyHouseInDatabaseByAddress(houseRequest) > 0;
     }
 
     @Override
@@ -91,10 +86,7 @@ public class H2Repository implements HousingDatabaseInterface {
     @Override
     public boolean existsByOccupant(OccupantRequest occupantRequest) {
 
-        if (identifyOccupantByItsFirstAndLastName(occupantRequest) > 0) {
-            return true;
-        }
-        return false;
+        return identifyOccupantByItsFirstAndLastName(occupantRequest) > 0;
     }
 
 
@@ -112,10 +104,7 @@ public class H2Repository implements HousingDatabaseInterface {
     public boolean houseHasSpareCapacity(HouseRequest houseRequest) {
         Optional<HouseInternalEntity> houseInternalEntityToBeChecked = houseRepository.findById(identifyHouseInDatabaseByAddress(houseRequest));
 
-        if (houseInternalEntityToBeChecked.get().getCurrentCapacity() < houseInternalEntityToBeChecked.get().getMaxCapacity()) {
-            return true;
-        }
-        return false;
+        return houseInternalEntityToBeChecked.get().getCurrentOccupancy() < houseInternalEntityToBeChecked.get().getMaxCapacity();
     }
 
     @Override
@@ -136,14 +125,14 @@ public class H2Repository implements HousingDatabaseInterface {
         Optional<HouseInternalEntity> houseInternalEntityToIncreaseCapacityByOne =
                 houseRepository.findById(identifyHouseInDatabaseByAddress(houseRequest));
 
-        houseInternalEntityToIncreaseCapacityByOne.get().setCurrentCapacity(houseInternalEntityToIncreaseCapacityByOne.get().getCurrentCapacity() + 1);
+        houseInternalEntityToIncreaseCapacityByOne.get().setCurrentOccupancy(houseInternalEntityToIncreaseCapacityByOne.get().getCurrentOccupancy() + 1);
 
 
         HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
                 houseInternalEntityToIncreaseCapacityByOne.get().getId(),
                 houseInternalEntityToIncreaseCapacityByOne.get().getHouseNumber(),
                 houseInternalEntityToIncreaseCapacityByOne.get().getMaxCapacity(),
-                houseInternalEntityToIncreaseCapacityByOne.get().getCurrentCapacity());
+                houseInternalEntityToIncreaseCapacityByOne.get().getCurrentOccupancy());
 
         houseRepository.save(houseInternalEntity);
     }
@@ -154,14 +143,14 @@ public class H2Repository implements HousingDatabaseInterface {
         Optional<HouseInternalEntity> houseInternalEntityToDecreaseCapacityByOne =
                 houseRepository.findById(identifyHouseInDatabaseByAddress(houseRequest));
 
-        houseInternalEntityToDecreaseCapacityByOne.get().setCurrentCapacity(houseInternalEntityToDecreaseCapacityByOne.get().getCurrentCapacity() - 1);
+        houseInternalEntityToDecreaseCapacityByOne.get().setCurrentOccupancy(houseInternalEntityToDecreaseCapacityByOne.get().getCurrentOccupancy() - 1);
 
 
         HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
                 houseInternalEntityToDecreaseCapacityByOne.get().getId(),
                 houseInternalEntityToDecreaseCapacityByOne.get().getHouseNumber(),
                 houseInternalEntityToDecreaseCapacityByOne.get().getMaxCapacity(),
-                houseInternalEntityToDecreaseCapacityByOne.get().getCurrentCapacity());
+                houseInternalEntityToDecreaseCapacityByOne.get().getCurrentOccupancy());
 
         houseRepository.save(houseInternalEntity);
 
