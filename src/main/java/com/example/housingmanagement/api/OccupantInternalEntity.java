@@ -13,6 +13,9 @@ public class OccupantInternalEntity {
     private String firstName;
     private String lastName;
 
+    private String gender;
+
+
     @ManyToOne
     @JoinColumn(name = "house Address")
     private HouseInternalEntity houseInternalEntity;
@@ -20,15 +23,18 @@ public class OccupantInternalEntity {
     public OccupantInternalEntity() {
     }
 
-    public OccupantInternalEntity(String firstName, String lastName) {
+    public OccupantInternalEntity(String firstName, String lastName, String gender) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.gender = gender;
+
     }
 
-    public OccupantInternalEntity(int id, String firstName, String lastName, HouseInternalEntity houseInternalEntity) {
+    public OccupantInternalEntity(int id, String firstName, String lastName, String gender, HouseInternalEntity houseInternalEntity) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.gender = gender;
         this.houseInternalEntity = houseInternalEntity;
     }
 
@@ -52,6 +58,14 @@ public class OccupantInternalEntity {
         this.lastName = lastName;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public HouseInternalEntity getHouseInternalEntity() {
         return houseInternalEntity;
     }
@@ -60,5 +74,8 @@ public class OccupantInternalEntity {
         this.houseInternalEntity = houseInternalEntity;
     }
 
-
+    @Override
+    public String toString() {
+        return firstName+ " " + lastName+ " " + gender;
+    }
 }

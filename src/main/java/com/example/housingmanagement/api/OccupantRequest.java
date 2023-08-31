@@ -6,9 +6,13 @@ public class OccupantRequest {
     private String firstName;
     private String lastName;
 
-    public OccupantRequest(String firstName, String lastName) {
+    private final String gender;
+
+
+    public OccupantRequest(String firstName, String lastName, String gender) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.gender = gender;
     }
 
     public String getFirstName() {
@@ -27,4 +31,7 @@ public class OccupantRequest {
         this.lastName = lastName;
     }
 
+    public String getGender() {
+        return gender;
+    }
 }

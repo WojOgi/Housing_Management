@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class HousingController {
@@ -71,6 +72,26 @@ public class HousingController {
 
         return ResponseEntity.ok().headers(responseHeader).body(occupantResponseList);
     }
+    @GetMapping(value = "occupants_of_a_specific_house")
+    public ResponseEntity<String> getAllOccupantsOfSpecificHouse(@RequestBody HouseRequest houseRequest){
+        HttpHeaders responseHeaders = new HttpHeaders();
+        //checks if this house exists
+        if(!housingDatabaseInterface.existsByHouse(houseRequest)){
+            return ResponseEntity.badRequest().headers(responseHeaders).body(
+                    "There is no house with number " + houseRequest.getHouseNumber() + " in the Database.");
+        }
+        //identifies house in internal database that matches the house from request
+        Optional<HouseInternalEntity> houseInternalEntity =
+                housingDatabaseInterface.
+                        identifiedHouseInDatabase(housingDatabaseInterface.identifyHouseInDatabaseByAddressFromRequest(houseRequest));
+        //returns a list of occupants of this house
+        List<OccupantInternalEntity> occupantsAssignedToThisHouse =
+                housingDatabaseInterface.getOccupantsAssignedToThisHouseIntEnt(houseInternalEntity);
+        //TODO: something with Optionals - there is a bug when there is Occupant with null house address the method does not work
+
+        return ResponseEntity.ok().headers(responseHeaders).body(occupantsAssignedToThisHouse.toString());
+
+    }
 
     @DeleteMapping(value = "/occupants")
     public ResponseEntity<String> deleteSpecificOccupant(@RequestBody OccupantRequest occupantToBeDeleted) {
@@ -100,14 +121,22 @@ public class HousingController {
     @PostMapping(value = "/occupants/add_occupant_without_house")
     public ResponseEntity<String> addOccupantWithoutHouse(@RequestBody OccupantRequest occupantToBeAddedWithoutHouse) {
         HttpHeaders responseHeaders = new HttpHeaders();
-
+        //check if such Occupant already exists
         if (housingDatabaseInterface.existsByOccupant(occupantToBeAddedWithoutHouse)) {
             return ResponseEntity.badRequest().headers(responseHeaders).body(
                     "An Occupant with full name: " + occupantToBeAddedWithoutHouse.getFirstName()
                             + " " + occupantToBeAddedWithoutHouse.getLastName() + " already exists in the Database.");
         }
+        //check if Gender is specified correctly
+        if(!(   housingDatabaseInterface.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("M")
+                             ||
+                housingDatabaseInterface.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("F"))){
+            return ResponseEntity.badRequest().headers(responseHeaders).body("You must specify Occupant gender as: " +
+                    "M (male) or F (female)");
+        }
+        //add Occupant to Database
         housingDatabaseInterface.addOccupantToDatabase(toOccupantInternalEntity(occupantToBeAddedWithoutHouse));
-        responseHeaders.set("post", "ading a new Occupant without a house to the Database");
+        responseHeaders.set("post", "adding a new Occupant without a house to the Database");
 
         return ResponseEntity.ok().headers(responseHeaders).body("Added Occupant without a house: "
                 + occupantToBeAddedWithoutHouse.getFirstName()
@@ -141,6 +170,8 @@ public class HousingController {
                         + "already has a House: " + housingDatabaseInterface
                         .houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()).toString());
             }
+        //TODO: check against gender mixing
+
             //assign the occupant from request to the house from request
             housingDatabaseInterface.assignSpecificOccupantToSpecificHouse(assignmentRequest.getHouseToAssign(), assignmentRequest.getOccupantToAssign());
             //increase the capacity of the house from request by one
@@ -219,7 +250,8 @@ public class HousingController {
     }
 
     private OccupantInternalEntity toOccupantInternalEntity(OccupantRequest occupantToBeAddedWithoutHouse) {
-        return new OccupantInternalEntity(occupantToBeAddedWithoutHouse.getFirstName(), occupantToBeAddedWithoutHouse.getLastName());
+        return new OccupantInternalEntity(occupantToBeAddedWithoutHouse.getFirstName(), occupantToBeAddedWithoutHouse.getLastName()
+        , occupantToBeAddedWithoutHouse.getGender());
     }
 
     private List<HouseResponse> toHouseResponse(List<HouseInternalEntity> allHouseInternalEntities) {
