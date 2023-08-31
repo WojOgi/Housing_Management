@@ -81,13 +81,13 @@ public class HousingController {
                     "There is no Occupant: " + occupantToBeDeleted.getFirstName()
                             + occupantToBeDeleted.getLastName() + " in the Database.");
         }
-        //check if occupant had a house
+        //check if occupant has a house
         if (housingDatabaseInterface.houseCurrentlyAssignedToThisOccupant(occupantToBeDeleted) != null) {
-            //if so, identify where the Occupant lived and reduce current capacity by 1
+            //if so, identify where the Occupant lives and reduce current capacity by 1
             HouseInternalEntity houseWhereTheOccupantLives =
                     housingDatabaseInterface.houseCurrentlyAssignedToThisOccupant(occupantToBeDeleted);
-            HouseRequest dummyHouseRequest = new HouseRequest(houseWhereTheOccupantLives.getHouseNumber());
-            housingDatabaseInterface.decreaseHouseCurrentCapacityByOne(dummyHouseRequest);
+            HouseRequest temporaryHouseRequest = new HouseRequest(houseWhereTheOccupantLives.getHouseNumber());
+            housingDatabaseInterface.decreaseHouseCurrentCapacityByOne(temporaryHouseRequest);
         }
         housingDatabaseInterface.deleteOccupantFromDatabase(occupantToBeDeleted);
 
@@ -103,7 +103,7 @@ public class HousingController {
 
         if (housingDatabaseInterface.existsByOccupant(occupantToBeAddedWithoutHouse)) {
             return ResponseEntity.badRequest().headers(responseHeaders).body(
-                    "An Occupant with this name: " + occupantToBeAddedWithoutHouse.getFirstName()
+                    "An Occupant with full name: " + occupantToBeAddedWithoutHouse.getFirstName()
                             + " " + occupantToBeAddedWithoutHouse.getLastName() + " already exists in the Database.");
         }
         housingDatabaseInterface.addOccupantToDatabase(toOccupantInternalEntity(occupantToBeAddedWithoutHouse));
