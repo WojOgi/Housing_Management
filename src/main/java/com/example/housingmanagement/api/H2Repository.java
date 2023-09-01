@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Primary
@@ -64,17 +65,13 @@ public class H2Repository implements HousingDatabaseInterface {
     public List<OccupantInternalEntity> getOccupantsAssignedToThisHouseIntEnt(Optional<HouseInternalEntity> houseInternalEntity) {
 
         List<OccupantInternalEntity> allOccupants = (List<OccupantInternalEntity>) occupantRepository.findAll();
-        List<OccupantInternalEntity> listOfOccupantsOfThisHouse = new ArrayList<>();
 
-        for (int i = 0; i < allOccupants.size(); i++) {
-            if (
-                    //TODO here must be the problem - if we iterate through occupant with null house .equals fails
-                    allOccupants.get(i).getHouseInternalEntity().getHouseNumber()
-                    .equals(houseInternalEntity.get().getHouseNumber())) {
-                listOfOccupantsOfThisHouse.add(allOccupants.get(i));
-            }
-        }
-        return listOfOccupantsOfThisHouse;
+        List<OccupantInternalEntity> occupantsWithAnyHouseAssigned =
+                allOccupants.stream().filter(x -> x.getHouseInternalEntity() != null).toList();
+
+        return occupantsWithAnyHouseAssigned.stream().filter(x->x.getHouseInternalEntity().getHouseNumber()
+                .equals(houseInternalEntity.get().getHouseNumber())).toList();
+
 
     }
 

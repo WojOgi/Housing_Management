@@ -21,6 +21,7 @@ public interface HousingDatabaseInterface {
 
     List<OccupantInternalEntity> getOccupantsAssignedToThisHouseIntEnt(Optional<HouseInternalEntity> houseInternalEntity);
 
+
     int houseCurrentCapacity(HouseRequest houseRequest);
 
     boolean existsByHouse(HouseRequest houseRequest);

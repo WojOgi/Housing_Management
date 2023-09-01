@@ -87,7 +87,6 @@ public class HousingController {
         //returns a list of occupants of this house
         List<OccupantInternalEntity> occupantsAssignedToThisHouse =
                 housingDatabaseInterface.getOccupantsAssignedToThisHouseIntEnt(houseInternalEntity);
-        //TODO: something with Optionals - there is a bug when there is Occupant with null house address the method does not work
 
         return ResponseEntity.ok().headers(responseHeaders).body(occupantsAssignedToThisHouse.toString());
 
