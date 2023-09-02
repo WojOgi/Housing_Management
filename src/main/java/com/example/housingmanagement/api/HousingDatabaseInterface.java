@@ -14,11 +14,9 @@ public interface HousingDatabaseInterface {
 
     List<OccupantInternalEntity> getAllOccupants();
 
-
     void addHouseToDatabase(HouseInternalEntity houseInternalEntity);
 
     void deleteHouseFromDatabase(HouseRequest houseRequest);
-
 
     int identifyHouseInDatabaseByAddressFromRequest(HouseRequest houseRequest);
 
@@ -26,11 +24,9 @@ public interface HousingDatabaseInterface {
 
     List<OccupantInternalEntity> getOccupantsAssignedToThisHouseIntEnt(Optional<HouseInternalEntity> houseInternalEntity);
 
-
     int houseCurrentCapacity(HouseRequest houseRequest);
 
     boolean existsByHouse(HouseRequest houseRequest);
-
 
     int identifyOccupantByItsFirstAndLastName(OccupantRequest occupantRequest);
 
@@ -40,11 +36,9 @@ public interface HousingDatabaseInterface {
 
     String retrieveOccupantGenderFromInternalEntity(OccupantInternalEntity occupantInternalEntity);
 
-
     void addOccupantToDatabase(OccupantInternalEntity occupantInternalEntity);
 
     void deleteOccupantFromDatabase(OccupantRequest occupantRequest);
-
 
     boolean houseHasSpareCapacity(HouseRequest houseRequest);
 
@@ -54,9 +48,5 @@ public interface HousingDatabaseInterface {
 
     void decreaseHouseCurrentCapacityByOne(HouseRequest houseRequest);
 
-
     void assignSpecificOccupantToSpecificHouse(HouseRequest houseRequest, OccupantRequest occupantRequest);
-    //void removeSpecificOccupantFromItsCurrentHouse(OccupantRequest occupantRequest);
-
-
 }

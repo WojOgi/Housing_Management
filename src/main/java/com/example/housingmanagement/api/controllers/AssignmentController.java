@@ -12,14 +12,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AssignmentController {
-
     @Autowired
     private HousingDatabaseInterface housingDatabaseInterface;
 
     @PutMapping(value = "/occupants/assign_specific_homeless_occupant_to_specific_house")
     public ResponseEntity<String> assignSpecificHomelessOccupantToSpecificHouse(@RequestBody AssignmentRequest assignmentRequest) {
         HttpHeaders responseHeaders = new HttpHeaders();
-
         //check if target house exists
         if (!housingDatabaseInterface.existsByHouse(assignmentRequest.getHouseToAssign())) {
             return ResponseEntity.badRequest().headers(responseHeaders).body("There is no house with address: "
@@ -44,7 +42,6 @@ public class AssignmentController {
                         .houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()).toString());
             }
             //TODO: check against gender mixing
-
             //assign the occupant from request to the house from request
             housingDatabaseInterface.assignSpecificOccupantToSpecificHouse(assignmentRequest.getHouseToAssign(), assignmentRequest.getOccupantToAssign());
             //increase the capacity of the house from request by one
@@ -57,13 +54,11 @@ public class AssignmentController {
         }
         return ResponseEntity.badRequest().headers(responseHeaders).body("The requested house: "
                 + assignmentRequest.getHouseToAssign().getHouseNumber() + " does not have spare capacity.");
-
     }
 
     @PutMapping(value = "/occupants/move_occupant_to_different_house")
     public ResponseEntity<String> moveSpecificOccupantToDifferentHouse(@RequestBody AssignmentRequest assignmentRequest) {
         HttpHeaders responseHeaders = new HttpHeaders();
-
         //check if target house exists
         if (!housingDatabaseInterface.existsByHouse(assignmentRequest.getHouseToAssign())) {
             return ResponseEntity.badRequest().headers(responseHeaders).body("There is no house with address: "
@@ -99,25 +94,18 @@ public class AssignmentController {
         //identify the old House of the Occupant and map it onto House Request
         HouseInternalEntity oldHouseOfTheOccupant = housingDatabaseInterface.houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign());
         HouseRequest oldHouseOfTheOccupantMappedToHouseRequest = new HouseRequest(oldHouseOfTheOccupant.getHouseNumber());
-
         //reduce the capacity of the previous house of Occupant by one PROBLEM
         housingDatabaseInterface.decreaseHouseCurrentCapacityByOne(oldHouseOfTheOccupantMappedToHouseRequest);
-
         //assign the occupant from request to the house from request
         housingDatabaseInterface.assignSpecificOccupantToSpecificHouse(assignmentRequest.getHouseToAssign(), assignmentRequest.getOccupantToAssign());
-
         //increase the capacity of the house from request by one
         housingDatabaseInterface.increaseHouseCurrentCapacityByOne(assignmentRequest.getHouseToAssign());
-
         return ResponseEntity.ok().headers(responseHeaders).body("Occupant: "
                 + assignmentRequest.getOccupantToAssign().getFirstName() + " "
                 + assignmentRequest.getOccupantToAssign().getLastName() + " "
                 + "who previously lived in House: " + oldHouseOfTheOccupant.toString() + " "
                 + "was moved to a new house: " + assignmentRequest.getHouseToAssign().getHouseNumber());
-
     }
-
-
 }
 
 

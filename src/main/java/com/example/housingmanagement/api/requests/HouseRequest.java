@@ -3,7 +3,6 @@ package com.example.housingmanagement.api.requests;
 import java.util.Objects;
 
 public class HouseRequest {
-
     private String houseNumber;
     private int maxCapacity;
 

@@ -8,7 +8,6 @@ public class OccupantRequest {
 
     private final String gender;
 
-
     public OccupantRequest(String firstName, String lastName, String gender) {
         this.firstName = firstName;
         this.lastName = lastName;

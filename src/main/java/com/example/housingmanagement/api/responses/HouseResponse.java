@@ -1,7 +1,6 @@
 package com.example.housingmanagement.api.responses;
 
 public class HouseResponse {
-
     private String houseNumber;
 
     public HouseResponse(String houseNumber) {

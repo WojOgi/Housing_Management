@@ -6,17 +6,12 @@ import jakarta.persistence.*;
 
 @Entity
 public class OccupantInternalEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-
     private int id;
     private String firstName;
     private String lastName;
-
     private String gender;
-
-
     @ManyToOne
     @JoinColumn(name = "house Address")
     private HouseInternalEntity houseInternalEntity;
@@ -28,7 +23,6 @@ public class OccupantInternalEntity {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-
     }
 
     public OccupantInternalEntity(int id, String firstName, String lastName, String gender, HouseInternalEntity houseInternalEntity) {
@@ -77,6 +71,6 @@ public class OccupantInternalEntity {
 
     @Override
     public String toString() {
-        return firstName+ " " + lastName+ " " + gender;
+        return firstName + " " + lastName + " " + gender;
     }
 }

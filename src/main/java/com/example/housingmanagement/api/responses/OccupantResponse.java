@@ -1,7 +1,6 @@
 package com.example.housingmanagement.api.responses;
 
 public class OccupantResponse {
-
     private String firstName;
     private String lastName;
 

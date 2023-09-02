@@ -7,11 +7,8 @@ public class HouseInternalEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-
     private int id;
-
     private String houseNumber;
-
     private int maxCapacity;
     private int currentOccupancy;
 

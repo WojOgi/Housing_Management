@@ -1,7 +1,6 @@
 package com.example.housingmanagement.api.requests;
 
 public class AssignmentRequest {
-
     private HouseRequest houseToAssign;
     private OccupantRequest occupantToAssign;
 
