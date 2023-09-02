@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Primary
-
 public class H2Repository implements HousingDatabaseInterface {
 
     @Autowired
