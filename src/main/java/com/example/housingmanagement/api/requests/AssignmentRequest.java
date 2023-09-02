@@ -1,4 +1,4 @@
-package com.example.housingmanagement.api;
+package com.example.housingmanagement.api.requests;
 
 public class AssignmentRequest {
 

@@ -1,13 +1,15 @@
 package com.example.housingmanagement.api;
 
+import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
+import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
+import com.example.housingmanagement.api.requests.HouseRequest;
+import com.example.housingmanagement.api.requests.OccupantRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Primary

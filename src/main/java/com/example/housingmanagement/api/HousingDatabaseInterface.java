@@ -1,5 +1,10 @@
 package com.example.housingmanagement.api;
 
+import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
+import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
+import com.example.housingmanagement.api.requests.HouseRequest;
+import com.example.housingmanagement.api.requests.OccupantRequest;
+
 import java.util.List;
 import java.util.Optional;
 

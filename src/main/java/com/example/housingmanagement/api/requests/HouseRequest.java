@@ -1,4 +1,4 @@
-package com.example.housingmanagement.api;
+package com.example.housingmanagement.api.requests;
 
 import java.util.Objects;
 

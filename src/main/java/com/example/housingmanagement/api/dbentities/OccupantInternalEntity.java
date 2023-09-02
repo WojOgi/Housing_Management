@@ -1,6 +1,7 @@
-package com.example.housingmanagement.api;
+package com.example.housingmanagement.api.dbentities;
 
 
+import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import jakarta.persistence.*;
 
 @Entity

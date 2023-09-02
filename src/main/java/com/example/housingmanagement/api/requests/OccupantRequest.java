@@ -1,13 +1,18 @@
-package com.example.housingmanagement.api;
+package com.example.housingmanagement.api.requests;
 
-public class OccupantResponse {
+import java.util.Objects;
 
+public class OccupantRequest {
     private String firstName;
     private String lastName;
 
-    public OccupantResponse(String firstName, String lastName) {
+    private final String gender;
+
+
+    public OccupantRequest(String firstName, String lastName, String gender) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.gender = gender;
     }
 
     public String getFirstName() {
@@ -24,5 +29,9 @@ public class OccupantResponse {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getGender() {
+        return gender;
     }
 }
