@@ -94,7 +94,7 @@ public class AssignmentController {
         //identify the old House of the Occupant and map it onto House Request
         HouseInternalEntity oldHouseOfTheOccupant = housingDatabaseInterface.houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign());
         HouseRequest oldHouseOfTheOccupantMappedToHouseRequest = new HouseRequest(oldHouseOfTheOccupant.getHouseNumber());
-        //reduce the capacity of the previous house of Occupant by one PROBLEM
+        //reduce the capacity of the previous house of Occupant by one
         housingDatabaseInterface.decreaseHouseCurrentCapacityByOne(oldHouseOfTheOccupantMappedToHouseRequest);
         //assign the occupant from request to the house from request
         housingDatabaseInterface.assignSpecificOccupantToSpecificHouse(assignmentRequest.getHouseToAssign(), assignmentRequest.getOccupantToAssign());
