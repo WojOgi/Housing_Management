@@ -7,5 +7,6 @@ public interface HouseRepositoryJPA extends JpaRepository<HouseInternalEntity, I
 
     HouseInternalEntity findByHouseNumber(String houseNumber);
 
+    void deleteByHouseNumber(String houseNumber);
     boolean existsByHouseNumber(String houseNumber);
 }

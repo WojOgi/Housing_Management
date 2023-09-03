@@ -7,6 +7,7 @@ import com.example.housingmanagement.api.requests.OccupantRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,9 +37,9 @@ public class H2Repository implements HousingDatabaseInterface {
     }
 
     @Override
+    @Transactional
     public void deleteHouseFromDatabase(HouseRequest houseRequest) {
-        //tutaj próbowałem zrobić delete w bardziej elegancki sposób korzystając z JPA ale się nie udawało
-        houseRepository.deleteById(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()).getId());
+        houseRepository.deleteByHouseNumber(houseRequest.getHouseNumber());
     }
 
     @Override
@@ -94,6 +95,7 @@ public class H2Repository implements HousingDatabaseInterface {
     @Override
     public void deleteOccupantFromDatabase(OccupantRequest occupantRequest) {
         //tutaj próbowałem zrobić delete w bardziej elegancki sposób korzystając z JPA ale się nie udawało
+        //@transation i przepisac
         occupantRepository.deleteById(occupantRepository.findByFirstNameAndLastName(
                 occupantRequest.getFirstName(), occupantRequest.getLastName()).getId());
     }
