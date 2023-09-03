@@ -42,8 +42,7 @@ public class HouseController {
         }
         //identifies house in internal database that matches the house from request
         Optional<HouseInternalEntity> houseInternalEntity =
-                housingDatabaseInterface.
-                        identifiedHouseInDatabase(housingDatabaseInterface.identifyHouseInDatabaseByAddressFromRequest(houseRequest));
+                Optional.ofNullable(housingDatabaseInterface.identifyHouseInternalEntity(houseRequest));
         //returns a list of occupants of this house
         List<OccupantInternalEntity> occupantsAssignedToThisHouse =
                 housingDatabaseInterface.getOccupantsAssignedToThisHouseIntEnt(houseInternalEntity);
@@ -55,7 +54,7 @@ public class HouseController {
     @PostMapping(value = "/housing")
     public ResponseEntity<String> addNewHouse(@RequestBody HouseRequest houseToBeAdded) {
         HttpHeaders responseHeaders = new HttpHeaders();
-
+        //checks if this house exists
         if (housingDatabaseInterface.existsByHouse(houseToBeAdded)) {
             return ResponseEntity.badRequest().headers(responseHeaders).body(
                     "A House with number " + houseToBeAdded.getHouseNumber() + " already exists");
@@ -80,6 +79,7 @@ public class HouseController {
             return ResponseEntity.badRequest().headers(responseHeaders).body(
                     "This house is occupied. House needs to be vacated before removal from the Database.");
         }
+        //TODO: the method below fails for some reason
         housingDatabaseInterface.deleteHouseFromDatabase(houseToBeDeleted);
 
         return ResponseEntity.ok().headers(responseHeaders).body("House with address: "

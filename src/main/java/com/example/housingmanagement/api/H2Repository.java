@@ -16,18 +16,18 @@ import java.util.Optional;
 public class H2Repository implements HousingDatabaseInterface {
 
     @Autowired
-    private HouseRepository houseRepository;
+    private HouseRepositoryJPA houseRepository;
     @Autowired
-    private OccupantRepository occupantRepository;
+    private OccupantRepositoryJPA occupantRepository;
 
     @Override
     public List<HouseInternalEntity> getAllHouses() {
-        return (List<HouseInternalEntity>) houseRepository.findAll();
+        return houseRepository.findAll();
     }
 
     @Override
     public List<OccupantInternalEntity> getAllOccupants() {
-        return (List<OccupantInternalEntity>) occupantRepository.findAll();
+        return occupantRepository.findAll();
     }
 
     @Override
@@ -37,33 +37,19 @@ public class H2Repository implements HousingDatabaseInterface {
 
     @Override
     public void deleteHouseFromDatabase(HouseRequest houseRequest) {
-        houseRepository.deleteById(identifyHouseInDatabaseByAddressFromRequest(houseRequest));
+        //tutaj próbowałem zrobić delete w bardziej elegancki sposób korzystając z JPA ale się nie udawało
+        houseRepository.deleteById(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()).getId());
     }
 
     @Override
-    public int identifyHouseInDatabaseByAddressFromRequest(HouseRequest houseRequest) {
-        List<HouseInternalEntity> houseInternalEntityList = (List<HouseInternalEntity>) houseRepository.findAll();
-
-        for (int i = 0; i < houseInternalEntityList.size(); i++) {
-
-            String houseNumberFromInternalEntityList = houseInternalEntityList.get(i).getHouseNumber();
-            String houseNumberFromHouseRequest = houseRequest.getHouseNumber();
-            if (houseNumberFromHouseRequest.equals(houseNumberFromInternalEntityList)) {
-                return houseInternalEntityList.get(i).getId();
-            }
-        }
-        return 0;
-    }
-
-    @Override
-    public Optional<HouseInternalEntity> identifiedHouseInDatabase(int houseId) {
-        return houseRepository.findById(houseId);
+    public HouseInternalEntity identifyHouseInternalEntity(HouseRequest houseRequest) {
+        return houseRepository.findByHouseNumber(houseRequest.getHouseNumber());
     }
 
     @Override
     public List<OccupantInternalEntity> getOccupantsAssignedToThisHouseIntEnt(Optional<HouseInternalEntity> houseInternalEntity) {
 
-        List<OccupantInternalEntity> allOccupants = (List<OccupantInternalEntity>) occupantRepository.findAll();
+        List<OccupantInternalEntity> allOccupants = occupantRepository.findAll();
 
         List<OccupantInternalEntity> occupantsWithAnyHouseAssigned =
                 allOccupants.stream().filter(x -> x.getHouseInternalEntity() != null).toList();
@@ -74,37 +60,19 @@ public class H2Repository implements HousingDatabaseInterface {
 
     @Override
     public int houseCurrentCapacity(HouseRequest houseRequest) {
-        return houseRepository.findById(identifyHouseInDatabaseByAddressFromRequest(houseRequest)).get().getCurrentOccupancy();
+        return houseRepository.findByHouseNumber(houseRequest.getHouseNumber()).getCurrentCapacity();
     }
 
     @Override
     public boolean existsByHouse(HouseRequest houseRequest) {
-        return identifyHouseInDatabaseByAddressFromRequest(houseRequest) > 0;
-    }
-
-    @Override
-    public int identifyOccupantByItsFirstAndLastName(OccupantRequest occupantRequest) {
-        List<OccupantInternalEntity> occupantInternalEntityList = (List<OccupantInternalEntity>) occupantRepository.findAll();
-        for (int i = 0; i < occupantInternalEntityList.size(); i++) {
-
-            String occupantFirstNameFromInternalOccupantList = occupantInternalEntityList.get(i).getFirstName();
-            String occupantLastNameFromInternalOccupantList = occupantInternalEntityList.get(i).getLastName();
-
-            String occupantFirstNameFromRequest = occupantRequest.getFirstName();
-            String occupantLastNameFromRequest = occupantRequest.getLastName();
-
-            if (occupantFirstNameFromInternalOccupantList.equals(occupantFirstNameFromRequest)
-                    && occupantLastNameFromInternalOccupantList.equals(occupantLastNameFromRequest)) {
-                return occupantInternalEntityList.get(i).getId();
-            }
-        }
-        return 0;
+        return houseRepository.existsByHouseNumber(houseRequest.getHouseNumber());
     }
 
     @Override
     public boolean existsByOccupant(OccupantRequest occupantRequest) {
 
-        return identifyOccupantByItsFirstAndLastName(occupantRequest) > 0;
+        return occupantRepository.existsByFirstNameAndLastName(
+                occupantRequest.getFirstName(), occupantRequest.getLastName());
     }
 
     @Override
@@ -125,21 +93,24 @@ public class H2Repository implements HousingDatabaseInterface {
 
     @Override
     public void deleteOccupantFromDatabase(OccupantRequest occupantRequest) {
-        occupantRepository.deleteById(identifyOccupantByItsFirstAndLastName(occupantRequest));
+        //tutaj próbowałem zrobić delete w bardziej elegancki sposób korzystając z JPA ale się nie udawało
+        occupantRepository.deleteById(occupantRepository.findByFirstNameAndLastName(
+                occupantRequest.getFirstName(), occupantRequest.getLastName()).getId());
     }
 
     @Override
     public boolean houseHasSpareCapacity(HouseRequest houseRequest) {
-        Optional<HouseInternalEntity> houseInternalEntityToBeChecked = houseRepository.findById(identifyHouseInDatabaseByAddressFromRequest(houseRequest));
+        Optional<HouseInternalEntity> houseInternalEntityToBeChecked = Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
 
-        return houseInternalEntityToBeChecked.get().getCurrentOccupancy() < houseInternalEntityToBeChecked.get().getMaxCapacity();
+        return houseInternalEntityToBeChecked.get().getCurrentCapacity() < houseInternalEntityToBeChecked.get().getMaxCapacity();
     }
 
     @Override
     public HouseInternalEntity houseCurrentlyAssignedToThisOccupant(OccupantRequest occupantRequest) {
         //identify the Occupant
         Optional<OccupantInternalEntity> occupantToCheckIfHasHouseAssigned =
-                occupantRepository.findById(identifyOccupantByItsFirstAndLastName(occupantRequest));
+                Optional.ofNullable(occupantRepository.findByFirstNameAndLastName(occupantRequest.getFirstName(),
+                        occupantRequest.getLastName()));
 
         if (occupantToCheckIfHasHouseAssigned.get().getHouseInternalEntity() == null) {
             return null;
@@ -151,15 +122,15 @@ public class H2Repository implements HousingDatabaseInterface {
     public void increaseHouseCurrentCapacityByOne(HouseRequest houseRequest) {
 
         Optional<HouseInternalEntity> houseInternalEntityToIncreaseCapacityByOne =
-                houseRepository.findById(identifyHouseInDatabaseByAddressFromRequest(houseRequest));
+                Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
 
-        houseInternalEntityToIncreaseCapacityByOne.get().setCurrentOccupancy(houseInternalEntityToIncreaseCapacityByOne.get().getCurrentOccupancy() + 1);
+        houseInternalEntityToIncreaseCapacityByOne.get().setCurrentCapacity(houseInternalEntityToIncreaseCapacityByOne.get().getCurrentCapacity() + 1);
 
         HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
                 houseInternalEntityToIncreaseCapacityByOne.get().getId(),
                 houseInternalEntityToIncreaseCapacityByOne.get().getHouseNumber(),
                 houseInternalEntityToIncreaseCapacityByOne.get().getMaxCapacity(),
-                houseInternalEntityToIncreaseCapacityByOne.get().getCurrentOccupancy());
+                houseInternalEntityToIncreaseCapacityByOne.get().getCurrentCapacity());
 
         houseRepository.save(houseInternalEntity);
     }
@@ -168,15 +139,15 @@ public class H2Repository implements HousingDatabaseInterface {
     public void decreaseHouseCurrentCapacityByOne(HouseRequest houseRequest) {
 
         Optional<HouseInternalEntity> houseInternalEntityToDecreaseCapacityByOne =
-                houseRepository.findById(identifyHouseInDatabaseByAddressFromRequest(houseRequest));
+                Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
 
-        houseInternalEntityToDecreaseCapacityByOne.get().setCurrentOccupancy(houseInternalEntityToDecreaseCapacityByOne.get().getCurrentOccupancy() - 1);
+        houseInternalEntityToDecreaseCapacityByOne.get().setCurrentCapacity(houseInternalEntityToDecreaseCapacityByOne.get().getCurrentCapacity() - 1);
 
         HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
                 houseInternalEntityToDecreaseCapacityByOne.get().getId(),
                 houseInternalEntityToDecreaseCapacityByOne.get().getHouseNumber(),
                 houseInternalEntityToDecreaseCapacityByOne.get().getMaxCapacity(),
-                houseInternalEntityToDecreaseCapacityByOne.get().getCurrentOccupancy());
+                houseInternalEntityToDecreaseCapacityByOne.get().getCurrentCapacity());
 
         houseRepository.save(houseInternalEntity);
     }
@@ -185,10 +156,11 @@ public class H2Repository implements HousingDatabaseInterface {
     public void assignSpecificOccupantToSpecificHouse(HouseRequest houseRequest, OccupantRequest occupantRequest) {
         //identify House
         Optional<HouseInternalEntity> houseInternalEntityToAssign =
-                houseRepository.findById(identifyHouseInDatabaseByAddressFromRequest(houseRequest));
+                Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
         //identify Occupant
         Optional<OccupantInternalEntity> occupantInternalEntityToAssign =
-                occupantRepository.findById(identifyOccupantByItsFirstAndLastName(occupantRequest));
+                Optional.ofNullable(occupantRepository.findByFirstNameAndLastName(occupantRequest.getFirstName(),
+                        occupantRequest.getLastName()));
         //update database entry for the identified occupant
         OccupantInternalEntity occupantInternalEntityToBeModified =
                 new OccupantInternalEntity(

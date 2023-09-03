@@ -10,7 +10,7 @@ public class HouseInternalEntity {
     private int id;
     private String houseNumber;
     private int maxCapacity;
-    private int currentOccupancy;
+    private int currentCapacity;
 
     public HouseInternalEntity(String houseNumber) {
         this.houseNumber = houseNumber;
@@ -19,17 +19,17 @@ public class HouseInternalEntity {
     public HouseInternalEntity() {
     }
 
-    public HouseInternalEntity(int id, String houseNumber, int maxCapacity, int currentOccupancy) {
+    public HouseInternalEntity(int id, String houseNumber, int maxCapacity, int currentCapacity) {
         this.id = id;
         this.houseNumber = houseNumber;
         this.maxCapacity = maxCapacity;
-        this.currentOccupancy = currentOccupancy;
+        this.currentCapacity = currentCapacity;
     }
 
-    public HouseInternalEntity(String houseNumber, int maxCapacity, int currentOccupancy) {
+    public HouseInternalEntity(String houseNumber, int maxCapacity, int currentCapacity) {
         this.houseNumber = houseNumber;
         this.maxCapacity = maxCapacity;
-        this.currentOccupancy = currentOccupancy;
+        this.currentCapacity = currentCapacity;
     }
 
     public int getId() {
@@ -52,12 +52,12 @@ public class HouseInternalEntity {
         this.maxCapacity = maxCapacity;
     }
 
-    public int getCurrentOccupancy() {
-        return currentOccupancy;
+    public int getCurrentCapacity() {
+        return currentCapacity;
     }
 
-    public void setCurrentOccupancy(int currentCapacity) {
-        this.currentOccupancy = currentCapacity;
+    public void setCurrentCapacity(int currentCapacity) {
+        this.currentCapacity = currentCapacity;
     }
 
     @Override

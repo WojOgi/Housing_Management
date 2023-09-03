@@ -18,9 +18,7 @@ public interface HousingDatabaseInterface {
 
     void deleteHouseFromDatabase(HouseRequest houseRequest);
 
-    int identifyHouseInDatabaseByAddressFromRequest(HouseRequest houseRequest);
-
-    Optional<HouseInternalEntity> identifiedHouseInDatabase(int houseId);
+    HouseInternalEntity identifyHouseInternalEntity(HouseRequest houseRequest);
 
     List<OccupantInternalEntity> getOccupantsAssignedToThisHouseIntEnt(Optional<HouseInternalEntity> houseInternalEntity);
 
@@ -28,7 +26,6 @@ public interface HousingDatabaseInterface {
 
     boolean existsByHouse(HouseRequest houseRequest);
 
-    int identifyOccupantByItsFirstAndLastName(OccupantRequest occupantRequest);
 
     boolean existsByOccupant(OccupantRequest occupantRequest);
 
