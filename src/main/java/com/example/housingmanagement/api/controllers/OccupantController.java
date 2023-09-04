@@ -63,7 +63,7 @@ public class OccupantController {
         //check if such occupant exists at all.
         if (!housingDatabaseInterface.existsByOccupant(occupantToBeDeleted)) {
             return ResponseEntity.badRequest().headers(responseHeaders).body(
-                    "There is no Occupant: " + occupantToBeDeleted.getFirstName()
+                    "There is no Occupant: " + occupantToBeDeleted.getFirstName()+ " "
                             + occupantToBeDeleted.getLastName() + " in the Database.");
         }
         //check if occupant has a house
