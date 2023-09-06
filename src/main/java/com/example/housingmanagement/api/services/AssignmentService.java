@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Service
 public class AssignmentService {
-
+//TODO deal with Optionals
     @Autowired
     private HouseRepositoryJPA houseRepository;
 

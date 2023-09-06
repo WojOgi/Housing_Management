@@ -1,17 +1,18 @@
 package com.example.housingmanagement.api.services;
 
-
 import com.example.housingmanagement.api.HouseRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class HouseService {
+    //TODO deal with Optionals
 
     @Autowired
     private HouseRepositoryJPA houseRepository;
@@ -24,6 +25,7 @@ public class HouseService {
         houseRepository.save(houseInternalEntity);
     }
 
+    @Transactional
     public void deleteHouseFromDatabase(HouseRequest houseRequest) {
         houseRepository.deleteByHouseNumber(houseRequest.getHouseNumber());
     }
@@ -45,6 +47,7 @@ public class HouseService {
 
         return houseInternalEntityToBeChecked.get().getCurrentCapacity() < houseInternalEntityToBeChecked.get().getMaxCapacity();
     }
+
     public void increaseHouseCurrentCapacityByOne(HouseRequest houseRequest) {
 
         Optional<HouseInternalEntity> houseInternalEntityToIncreaseCapacityByOne =
@@ -60,6 +63,7 @@ public class HouseService {
 
         houseRepository.save(houseInternalEntity);
     }
+
     public void decreaseHouseCurrentCapacityByOne(HouseRequest houseRequest) {
 
         Optional<HouseInternalEntity> houseInternalEntityToDecreaseCapacityByOne =
@@ -75,7 +79,6 @@ public class HouseService {
 
         houseRepository.save(houseInternalEntity);
     }
-
 
 
 }
