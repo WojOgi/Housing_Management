@@ -12,7 +12,8 @@ import java.util.Optional;
 
 @Service
 public class HouseService {
-    //TODO deal with Optionals
+    //TODO deal with Optionals - at the moment our Controllers check if the Optionals below would contain null and react
+    //TODO with an appropriate ResponseEntity.
 
     @Autowired
     private HouseRepositoryJPA houseRepository;
