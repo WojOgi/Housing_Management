@@ -3,7 +3,6 @@ package com.example.housingmanagement.api.services;
 import com.example.housingmanagement.api.HouseRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,9 +13,11 @@ import java.util.Optional;
 public class HouseService {
     //TODO deal with Optionals - at the moment our Controllers check if the Optionals below would contain null and react
     //TODO with an appropriate ResponseEntity.
+    private final HouseRepositoryJPA houseRepository;
 
-    @Autowired
-    private HouseRepositoryJPA houseRepository;
+    public HouseService(HouseRepositoryJPA houseRepository) {
+        this.houseRepository = houseRepository;
+    }
 
     public List<HouseInternalEntity> fetchAll() {
         return houseRepository.findAll();

@@ -4,7 +4,6 @@ import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
 import com.example.housingmanagement.api.services.OccupantService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +16,11 @@ import java.util.List;
 
 @RestController
 public class OccupantController {
-    @Autowired
-    private OccupantService occupantService;
+    private final OccupantService occupantService;
+
+    public OccupantController(OccupantService occupantService) {
+        this.occupantService = occupantService;
+    }
 
     @GetMapping(value = "/occupants")
     public ResponseEntity<List<OccupantResponse>> getAllOccupants() {

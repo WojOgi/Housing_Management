@@ -8,7 +8,6 @@ import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.services.AssignmentService;
 import com.example.housingmanagement.api.services.HouseService;
 import com.example.housingmanagement.api.services.OccupantService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +17,15 @@ import java.util.Optional;
 
 @RestController
 public class AssignmentController {
-    @Autowired
-    private AssignmentService assignmentService;
-    @Autowired
-    private HouseService houseService;
-    @Autowired
-    private OccupantService occupantService;
+    private final AssignmentService assignmentService;
+    private final HouseService houseService;
+    private final OccupantService occupantService;
+
+    public AssignmentController(AssignmentService assignmentService, HouseService houseService, OccupantService occupantService) {
+        this.assignmentService = assignmentService;
+        this.houseService = houseService;
+        this.occupantService = occupantService;
+    }
 
     @GetMapping(value = "occupants_of_a_specific_house")
     public ResponseEntity<String> getAllOccupantsOfSpecificHouse(@RequestBody HouseRequest houseRequest) {

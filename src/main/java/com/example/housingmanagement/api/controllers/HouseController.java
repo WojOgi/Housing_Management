@@ -4,7 +4,6 @@ import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
 import com.example.housingmanagement.api.services.HouseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +13,11 @@ import java.util.List;
 
 @RestController
 public class HouseController {
-    @Autowired
-    private HouseService houseService;
+    private final HouseService houseService;
+
+    public HouseController(HouseService houseService) {
+        this.houseService = houseService;
+    }
 
     @GetMapping(value = "/housing")
     public ResponseEntity<List<HouseResponse>> getAllHouses() {
