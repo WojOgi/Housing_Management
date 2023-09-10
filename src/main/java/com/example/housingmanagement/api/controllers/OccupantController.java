@@ -1,6 +1,7 @@
 package com.example.housingmanagement.api.controllers;
 
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
+import com.example.housingmanagement.api.mappers.OccupantMapperInterface;
 import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
 import com.example.housingmanagement.api.services.OccupantService;
@@ -11,16 +12,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class OccupantController {
     private final OccupantService occupantService;
+private final OccupantMapperInterface occupantMapper;
 
-    public OccupantController(OccupantService occupantService) {
+    public OccupantController(OccupantService occupantService, OccupantMapperInterface occupantMapper) {
         this.occupantService = occupantService;
+        this.occupantMapper = occupantMapper;
     }
+
 
     @GetMapping(value = "/occupants")
     public ResponseEntity<List<OccupantResponse>> getAllOccupants() {
@@ -28,7 +31,7 @@ public class OccupantController {
         responseHeader.set("get", "get all Occupants from the Database");
 
         List<OccupantInternalEntity> occupantInternalEntityList = occupantService.fetchAll();
-        List<OccupantResponse> occupantResponseList = toOccupantResponse(occupantInternalEntityList);
+        List<OccupantResponse> occupantResponseList = occupantMapper.toOccupantResponse(occupantInternalEntityList);
 
         return ResponseEntity.ok().headers(responseHeader).body(occupantResponseList);
     }
@@ -50,7 +53,7 @@ public class OccupantController {
                     "M (male) or F (female)");
         }
         //add Occupant to Database
-        occupantService.addOccupantToDatabase(toOccupantInternalEntity(occupantToBeAddedWithoutHouse));
+        occupantService.addOccupantToDatabase(occupantMapper.toOccupantInternalEntity(occupantToBeAddedWithoutHouse));
         responseHeaders.set("post", "adding a new Occupant without a house to the Database");
 
         return ResponseEntity.ok().headers(responseHeaders).body("Added Occupant without a house: "
@@ -58,20 +61,7 @@ public class OccupantController {
                 + " " + occupantToBeAddedWithoutHouse.getLastName());
     }
 
-    private List<OccupantResponse> toOccupantResponse(List<OccupantInternalEntity> occupantInternalEntityList) {
-        List<OccupantResponse> occupantResponseList = new ArrayList<>();
-        for (int i = 0; i < occupantInternalEntityList.size(); i++) {
-            OccupantInternalEntity currentElement = occupantInternalEntityList.get(i);
-            OccupantResponse occupantResponse = new OccupantResponse(currentElement.getFirstName(), currentElement.getLastName());
-            occupantResponseList.add(occupantResponse);
-        }
-        return occupantResponseList;
-    }
 
-    private OccupantInternalEntity toOccupantInternalEntity(OccupantRequest occupantToBeAddedWithoutHouse) {
-        return new OccupantInternalEntity(occupantToBeAddedWithoutHouse.getFirstName(), occupantToBeAddedWithoutHouse.getLastName()
-                , occupantToBeAddedWithoutHouse.getGender());
-    }
 
 
 }
