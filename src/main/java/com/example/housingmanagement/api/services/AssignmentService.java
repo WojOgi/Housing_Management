@@ -6,7 +6,6 @@ import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.requests.OccupantRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,14 +13,17 @@ import java.util.Optional;
 
 @Service
 public class AssignmentService {
-//TODO deal with Optionals
-    @Autowired
-    private HouseRepositoryJPA houseRepository;
+    //TODO deal with Optionals
+    private final HouseRepositoryJPA houseRepository;
 
-    @Autowired
-    private OccupantRepositoryJPA occupantRepository;
+    private final OccupantRepositoryJPA occupantRepository;
 
-    public List<OccupantInternalEntity> getOccupantsAssignedToThisHouseIntEnt(Optional<HouseInternalEntity> houseInternalEntity){
+    public AssignmentService(HouseRepositoryJPA houseRepository, OccupantRepositoryJPA occupantRepository) {
+        this.houseRepository = houseRepository;
+        this.occupantRepository = occupantRepository;
+    }
+
+    public List<OccupantInternalEntity> getOccupantsAssignedToThisHouseIntEnt(Optional<HouseInternalEntity> houseInternalEntity) {
         List<OccupantInternalEntity> allOccupants = occupantRepository.findAll();
 
         List<OccupantInternalEntity> occupantsWithAnyHouseAssigned =
@@ -31,6 +33,7 @@ public class AssignmentService {
                 .equals(houseInternalEntity.get().getHouseNumber())).toList();
 
     }
+
     public HouseInternalEntity houseCurrentlyAssignedToThisOccupant(OccupantRequest occupantRequest) {
         Optional<OccupantInternalEntity> occupantToCheckIfHasHouseAssigned =
                 Optional.ofNullable(occupantRepository.findByFirstNameAndLastName(occupantRequest.getFirstName(),
@@ -41,6 +44,7 @@ public class AssignmentService {
         }
         return occupantToCheckIfHasHouseAssigned.get().getHouseInternalEntity();
     }
+
     public void assignSpecificOccupantToSpecificHouse(HouseRequest houseRequest, OccupantRequest occupantRequest) {
         //identify House
         Optional<HouseInternalEntity> houseInternalEntityToAssign =
