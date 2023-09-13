@@ -30,12 +30,9 @@ public class HouseController {
     public ResponseEntity<Void> addNewHouse(@RequestBody HouseRequest houseToBeAdded) {
         //checks if this house exists
         if (houseService.existsByHouse(houseToBeAdded)) {
-            System.out.println("A House with number " + houseToBeAdded.getHouseNumber() + " already exists");
             return ResponseEntity.badRequest().build();
         }
         houseService.addHouseToDatabase(houseMapper.toHouseInternalEntity(houseToBeAdded));
-        System.out.println("Added House with address: " + houseToBeAdded.getHouseNumber());
-
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -43,17 +40,13 @@ public class HouseController {
     public ResponseEntity<Void> deleteSpecificHouse(@RequestBody HouseRequest houseToBeDeleted) {
         //check if such house exists in Database
         if (!houseService.existsByHouse(houseToBeDeleted)) {
-            System.out.println("There is no house with number " + houseToBeDeleted.getHouseNumber() + " in the Database.");
-            return ResponseEntity.badRequest().build();
+           return ResponseEntity.badRequest().build();
         }
         //check if the House is occupied by anybody
         if (houseService.houseCurrentCapacity(houseToBeDeleted) > 0) {
-            System.out.println("This house is occupied. House needs to be vacated before removal from the Database.");
-            return ResponseEntity.badRequest().build();
+           return ResponseEntity.badRequest().build();
         }
         houseService.deleteHouseFromDatabase(houseToBeDeleted);
-        System.out.println("House with address: " + houseToBeDeleted.getHouseNumber() + " was deleted from Database.");
-
         return ResponseEntity.ok().build();
     }
 
