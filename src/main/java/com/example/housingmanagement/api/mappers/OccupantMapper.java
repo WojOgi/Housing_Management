@@ -5,19 +5,18 @@ import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 public class OccupantMapper implements OccupantMapperInterface {
     @Override
     public List<OccupantResponse> toOccupantResponse(List<OccupantInternalEntity> occupantInternalEntityList) {
-        List<OccupantResponse> occupantResponseList = new ArrayList<>();
-        for (OccupantInternalEntity currentElement : occupantInternalEntityList) {
-            OccupantResponse occupantResponse = new OccupantResponse(currentElement.getFirstName(), currentElement.getLastName());
-            occupantResponseList.add(occupantResponse);
-        }
-        return occupantResponseList;
+        return Optional.ofNullable(occupantInternalEntityList).orElse(List.of()).stream()
+                .filter(Objects::nonNull)
+                .map(entity -> new OccupantResponse(entity.getFirstName(), entity.getLastName()))
+                .toList();
     }
 
     @Override

@@ -45,9 +45,11 @@ public class HouseService {
     }
 
     public boolean houseHasSpareCapacity(HouseRequest houseRequest) {
-        Optional<HouseInternalEntity> houseInternalEntityToBeChecked = Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
+        Optional<HouseInternalEntity> houseInternalEntityToBeChecked =
+                Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
 
-        return houseInternalEntityToBeChecked.get().getCurrentCapacity() < houseInternalEntityToBeChecked.get().getMaxCapacity();
+        return houseInternalEntityToBeChecked
+                .filter(houseInternalEntity -> houseInternalEntity.getCurrentCapacity() < houseInternalEntity.getMaxCapacity()).isPresent();
     }
 
     public void increaseHouseCurrentCapacityByOne(HouseRequest houseRequest) {
@@ -55,15 +57,19 @@ public class HouseService {
         Optional<HouseInternalEntity> houseInternalEntityToIncreaseCapacityByOne =
                 Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
 
-        houseInternalEntityToIncreaseCapacityByOne.get().setCurrentCapacity(houseInternalEntityToIncreaseCapacityByOne.get().getCurrentCapacity() + 1);
+        houseInternalEntityToIncreaseCapacityByOne
+                .ifPresent(houseInternalEntity -> houseInternalEntity.setCurrentCapacity(houseInternalEntity.getCurrentCapacity() + 1));
 
-        HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
-                houseInternalEntityToIncreaseCapacityByOne.get().getId(),
-                houseInternalEntityToIncreaseCapacityByOne.get().getHouseNumber(),
-                houseInternalEntityToIncreaseCapacityByOne.get().getMaxCapacity(),
-                houseInternalEntityToIncreaseCapacityByOne.get().getCurrentCapacity());
+        if (houseInternalEntityToIncreaseCapacityByOne.isPresent()) {
+            HouseInternalEntity houseInternalEntity1 = houseInternalEntityToIncreaseCapacityByOne.get();
+            HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
+                    houseInternalEntity1.getId(),
+                    houseInternalEntity1.getHouseNumber(),
+                    houseInternalEntity1.getMaxCapacity(),
+                    houseInternalEntity1.getCurrentCapacity());
 
-        houseRepository.save(houseInternalEntity);
+            houseRepository.save(houseInternalEntity);
+        }
     }
 
     public void decreaseHouseCurrentCapacityByOne(HouseRequest houseRequest) {
@@ -71,16 +77,19 @@ public class HouseService {
         Optional<HouseInternalEntity> houseInternalEntityToDecreaseCapacityByOne =
                 Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
 
-        houseInternalEntityToDecreaseCapacityByOne.get().setCurrentCapacity(houseInternalEntityToDecreaseCapacityByOne.get().getCurrentCapacity() - 1);
+        houseInternalEntityToDecreaseCapacityByOne
+                .ifPresent(houseInternalEntity -> houseInternalEntity.setCurrentCapacity(houseInternalEntity.getCurrentCapacity() + 1));
 
-        HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
-                houseInternalEntityToDecreaseCapacityByOne.get().getId(),
-                houseInternalEntityToDecreaseCapacityByOne.get().getHouseNumber(),
-                houseInternalEntityToDecreaseCapacityByOne.get().getMaxCapacity(),
-                houseInternalEntityToDecreaseCapacityByOne.get().getCurrentCapacity());
+        if (houseInternalEntityToDecreaseCapacityByOne.isPresent()) {
 
-        houseRepository.save(houseInternalEntity);
+            HouseInternalEntity houseInternalEntity1 = houseInternalEntityToDecreaseCapacityByOne.get();
+            HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
+                    houseInternalEntity1.getId(),
+                    houseInternalEntity1.getHouseNumber(),
+                    houseInternalEntity1.getMaxCapacity(),
+                    houseInternalEntity1.getCurrentCapacity());
+
+            houseRepository.save(houseInternalEntity);
+        }
     }
-
-
 }
