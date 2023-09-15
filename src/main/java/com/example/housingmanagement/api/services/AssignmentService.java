@@ -40,13 +40,17 @@ public class AssignmentService {
                 Optional.ofNullable(occupantRepository.findByFirstNameAndLastName(occupantRequest.getFirstName(),
                         occupantRequest.getLastName()));
         //potentially method to be extracted
-        if (occupantToCheckIfHasHouseAssigned.isPresent() &&
-                occupantToCheckIfHasHouseAssigned.get().getHouseInternalEntity() == null) {
+        if (occupantExistsButHouseDoesNot(occupantToCheckIfHasHouseAssigned)) {
             return null;
         }
         return occupantToCheckIfHasHouseAssigned
                 .map(OccupantInternalEntity::getHouseInternalEntity)
                 .orElse(null);
+    }
+
+    private static boolean occupantExistsButHouseDoesNot(Optional<OccupantInternalEntity> occupantToCheckIfHasHouseAssigned) {
+        return occupantToCheckIfHasHouseAssigned.isPresent() &&
+                occupantToCheckIfHasHouseAssigned.get().getHouseInternalEntity() == null;
     }
 
     public void assignSpecificOccupantToSpecificHouse(HouseRequest houseRequest, OccupantRequest occupantRequest) {
