@@ -61,11 +61,12 @@ public class HouseService {
                 .ifPresent(houseInternalEntity -> houseInternalEntity.setCurrentCapacity(houseInternalEntity.getCurrentCapacity() + 1));
 
         if (houseInternalEntityToIncreaseCapacityByOne.isPresent()) {
+            HouseInternalEntity houseInternalEntity1 = houseInternalEntityToIncreaseCapacityByOne.get();
             HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
-                    houseInternalEntityToIncreaseCapacityByOne.get().getId(),
-                    houseInternalEntityToIncreaseCapacityByOne.get().getHouseNumber(),
-                    houseInternalEntityToIncreaseCapacityByOne.get().getMaxCapacity(),
-                    houseInternalEntityToIncreaseCapacityByOne.get().getCurrentCapacity());
+                    houseInternalEntity1.getId(),
+                    houseInternalEntity1.getHouseNumber(),
+                    houseInternalEntity1.getMaxCapacity(),
+                    houseInternalEntity1.getCurrentCapacity());
 
             houseRepository.save(houseInternalEntity);
         }
@@ -81,11 +82,12 @@ public class HouseService {
 
         if (houseInternalEntityToDecreaseCapacityByOne.isPresent()) {
 
+            HouseInternalEntity houseInternalEntity1 = houseInternalEntityToDecreaseCapacityByOne.get();
             HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
-                    houseInternalEntityToDecreaseCapacityByOne.get().getId(),
-                    houseInternalEntityToDecreaseCapacityByOne.get().getHouseNumber(),
-                    houseInternalEntityToDecreaseCapacityByOne.get().getMaxCapacity(),
-                    houseInternalEntityToDecreaseCapacityByOne.get().getCurrentCapacity());
+                    houseInternalEntity1.getId(),
+                    houseInternalEntity1.getHouseNumber(),
+                    houseInternalEntity1.getMaxCapacity(),
+                    houseInternalEntity1.getCurrentCapacity());
 
             houseRepository.save(houseInternalEntity);
         }

@@ -40,11 +40,11 @@ public class HouseController {
     public ResponseEntity<Void> deleteSpecificHouse(@RequestBody HouseRequest houseToBeDeleted) {
         //check if such house exists in Database
         if (!houseService.existsByHouse(houseToBeDeleted)) {
-           return ResponseEntity.badRequest().build();
+           return ResponseEntity.unprocessableEntity().build();
         }
         //check if the House is occupied by anybody
         if (houseService.houseCurrentCapacity(houseToBeDeleted) > 0) {
-           return ResponseEntity.badRequest().build();
+           return ResponseEntity.unprocessableEntity().build();
         }
         houseService.deleteHouseFromDatabase(houseToBeDeleted);
         return ResponseEntity.ok().build();

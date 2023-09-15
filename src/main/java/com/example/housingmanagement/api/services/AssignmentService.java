@@ -29,20 +29,24 @@ public class AssignmentService {
         List<OccupantInternalEntity> occupantsWithAnyHouseAssigned =
                 allOccupants.stream().filter(x -> x.getHouseInternalEntity() != null).toList();
 
-        return houseInternalEntity.map(internalEntity -> occupantsWithAnyHouseAssigned.stream().filter(x -> x.getHouseInternalEntity().getHouseNumber()
-                .equals(internalEntity.getHouseNumber())).toList()).orElse(occupantsWithAnyHouseAssigned);
+        return houseInternalEntity
+                .map(internalEntity -> occupantsWithAnyHouseAssigned.stream()
+                        .filter(x -> x.getHouseInternalEntity().getHouseNumber()
+                                .equals(internalEntity.getHouseNumber())).toList()).orElse(occupantsWithAnyHouseAssigned);
     }
 
     public HouseInternalEntity houseCurrentlyAssignedToThisOccupant(OccupantRequest occupantRequest) {
         Optional<OccupantInternalEntity> occupantToCheckIfHasHouseAssigned =
                 Optional.ofNullable(occupantRepository.findByFirstNameAndLastName(occupantRequest.getFirstName(),
                         occupantRequest.getLastName()));
-
+        //potentially method to be extracted
         if (occupantToCheckIfHasHouseAssigned.isPresent() &&
                 occupantToCheckIfHasHouseAssigned.get().getHouseInternalEntity() == null) {
             return null;
         }
-        return occupantToCheckIfHasHouseAssigned.map(OccupantInternalEntity::getHouseInternalEntity).orElse(null);
+        return occupantToCheckIfHasHouseAssigned
+                .map(OccupantInternalEntity::getHouseInternalEntity)
+                .orElse(null);
     }
 
     public void assignSpecificOccupantToSpecificHouse(HouseRequest houseRequest, OccupantRequest occupantRequest) {
@@ -54,13 +58,15 @@ public class AssignmentService {
                 Optional.ofNullable(occupantRepository.findByFirstNameAndLastName(occupantRequest.getFirstName(),
                         occupantRequest.getLastName()));
         //update database entry for the identified occupant
+        //potentially method to be extracted
         if (occupantInternalEntityToAssign.isPresent() && houseInternalEntityToAssign.isPresent()) {
+            OccupantInternalEntity occupantInternalEntity = occupantInternalEntityToAssign.get();
             OccupantInternalEntity occupantInternalEntityToBeModified =
                     new OccupantInternalEntity(
-                            occupantInternalEntityToAssign.get().getId(),
-                            occupantInternalEntityToAssign.get().getFirstName(),
-                            occupantInternalEntityToAssign.get().getLastName(),
-                            occupantInternalEntityToAssign.get().getGender(),
+                            occupantInternalEntity.getId(),
+                            occupantInternalEntity.getFirstName(),
+                            occupantInternalEntity.getLastName(),
+                            occupantInternalEntity.getGender(),
                             houseInternalEntityToAssign.get());
             occupantRepository.save(occupantInternalEntityToBeModified);
         }
