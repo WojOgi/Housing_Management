@@ -10,5 +10,5 @@ public interface HouseMapperInterface {
 
     List<HouseResponse> toHouseResponse(List<HouseInternalEntity> allHouseInternalEntities);
 
-    HouseInternalEntity toHouseInternalEntity(HouseRequest houseToBeAdded);
+    HouseInternalEntity toHouseInternalEntity(HouseRequest request);
 }
