@@ -32,7 +32,7 @@ public class AssignmentController {
         this.occupantMapper = occupantMapper;
     }
 
-    @GetMapping(value = "occupants_of_a_specific_house")
+    @GetMapping(value = "/occupants_of_a_specific_house")
     public ResponseEntity<List<OccupantResponse>> getAllOccupantsOfSpecificHouse(@RequestBody HouseRequest houseRequest) {
         //checks if this house exists
         if (!houseService.existsByHouse(houseRequest)) {

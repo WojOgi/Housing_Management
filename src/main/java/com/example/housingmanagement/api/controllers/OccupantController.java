@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+@RestController(value = "/occupants")
 public class OccupantController {
     private final OccupantService occupantService;
     private final OccupantMapperInterface occupantMapper;
@@ -22,13 +22,13 @@ public class OccupantController {
         this.occupantMapper = occupantMapper;
     }
 
-    @GetMapping(value = "/occupants")
+    @GetMapping
     public ResponseEntity<List<OccupantResponse>> getAllOccupants() {
         List<OccupantResponse> occupantResponseList = occupantMapper.toOccupantResponse(occupantService.fetchAll());
         return ResponseEntity.ok().body(occupantResponseList);
     }
 
-    @PostMapping(value = "/occupants/add_occupant_without_house")
+    @PostMapping
     public ResponseEntity<Void> addOccupantWithoutHouse(@RequestBody OccupantRequest occupantToBeAddedWithoutHouse) {
         //check if such Occupant already exists
         if (occupantService.existsByOccupant(occupantToBeAddedWithoutHouse)) {
