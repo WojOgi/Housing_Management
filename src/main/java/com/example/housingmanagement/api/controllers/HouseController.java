@@ -30,7 +30,7 @@ public class HouseController {
     public ResponseEntity<Void> addNewHouse(@RequestBody HouseRequest houseToBeAdded) {
         //checks if this house exists
         if (houseService.existsByHouse(houseToBeAdded)) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.unprocessableEntity().build();
         }
         houseService.addHouseToDatabase(houseMapper.toHouseInternalEntity(houseToBeAdded));
         return ResponseEntity.status(HttpStatus.CREATED).build();

@@ -32,16 +32,20 @@ public class OccupantController {
     public ResponseEntity<Void> addOccupantWithoutHouse(@RequestBody OccupantRequest occupantToBeAddedWithoutHouse) {
         //check if such Occupant already exists
         if (occupantService.existsByOccupant(occupantToBeAddedWithoutHouse)) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.unprocessableEntity().build();
         }
         //check if Gender is specified correctly
-        if (!(occupantService.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("M")
-                ||
-                occupantService.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("F"))) {
-            return ResponseEntity.badRequest().build();
+        if (genderSpecifiedIncorrectly(occupantToBeAddedWithoutHouse)) {
+            return ResponseEntity.unprocessableEntity().build();
         }
         //add Occupant to Database
         occupantService.addOccupantToDatabase(occupantMapper.toOccupantInternalEntity(occupantToBeAddedWithoutHouse));
         return ResponseEntity.ok().build();
+    }
+
+    private boolean genderSpecifiedIncorrectly(OccupantRequest occupantToBeAddedWithoutHouse) {
+        return !(occupantService.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("M")
+                ||
+                occupantService.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("F"));
     }
 }
