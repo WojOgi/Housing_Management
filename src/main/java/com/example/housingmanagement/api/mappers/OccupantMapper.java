@@ -20,8 +20,8 @@ public class OccupantMapper implements OccupantMapperInterface {
     }
 
     @Override
-    public OccupantInternalEntity toOccupantInternalEntity(OccupantRequest occupantToBeAddedWithoutHouse) {
-        return new OccupantInternalEntity(occupantToBeAddedWithoutHouse.getFirstName(), occupantToBeAddedWithoutHouse.getLastName()
-                , occupantToBeAddedWithoutHouse.getGender());
+    public OccupantInternalEntity toOccupantInternalEntity(OccupantRequest request) {
+        return new OccupantInternalEntity(request.getFirstName(), request.getLastName()
+                , request.getGender());
     }
 }

@@ -26,8 +26,8 @@ public class HouseMapper implements HouseMapperInterface {
     }
 
     @Override
-    public HouseInternalEntity toHouseInternalEntity(HouseRequest houseToBeAdded) {
-        return new HouseInternalEntity(houseToBeAdded.getHouseNumber(),
-                houseToBeAdded.getMaxCapacity(), 0);
+    public HouseInternalEntity toHouseInternalEntity(HouseRequest request) {
+        return new HouseInternalEntity(request.getHouseNumber(),
+                request.getMaxCapacity(), 0);
     }
 }

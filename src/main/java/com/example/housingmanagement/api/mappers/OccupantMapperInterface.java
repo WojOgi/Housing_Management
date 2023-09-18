@@ -10,5 +10,5 @@ public interface OccupantMapperInterface {
 
     List<OccupantResponse> toOccupantResponse(List<OccupantInternalEntity> occupantInternalEntityList);
 
-    OccupantInternalEntity toOccupantInternalEntity(OccupantRequest occupantToBeAddedWithoutHouse);
+    OccupantInternalEntity toOccupantInternalEntity(OccupantRequest request);
 }
