@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController(value = "/housing")
 public class HouseController {
     private final HouseService houseService;
     private final HouseMapperInterface houseMapper;
@@ -20,23 +20,23 @@ public class HouseController {
         this.houseMapper = houseMapper;
     }
 
-    @GetMapping(value = "/housing")
+    @GetMapping
     public ResponseEntity<List<HouseResponse>> getAllHouses() {
         List<HouseResponse> houseResponses = houseMapper.toHouseResponse(houseService.fetchAll());
         return ResponseEntity.ok().body(houseResponses);
     }
 
-    @PostMapping(value = "/housing")
+    @PostMapping
     public ResponseEntity<Void> addNewHouse(@RequestBody HouseRequest houseToBeAdded) {
         //checks if this house exists
         if (houseService.existsByHouse(houseToBeAdded)) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.unprocessableEntity().build();
         }
         houseService.addHouseToDatabase(houseMapper.toHouseInternalEntity(houseToBeAdded));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping(value = "/housing")
+    @DeleteMapping
     public ResponseEntity<Void> deleteSpecificHouse(@RequestBody HouseRequest houseToBeDeleted) {
         //check if such house exists in Database
         if (!houseService.existsByHouse(houseToBeDeleted)) {

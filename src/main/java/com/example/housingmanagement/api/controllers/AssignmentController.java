@@ -32,11 +32,11 @@ public class AssignmentController {
         this.occupantMapper = occupantMapper;
     }
 
-    @GetMapping(value = "occupants_of_a_specific_house")
+    @GetMapping(value = "/occupants_of_a_specific_house")
     public ResponseEntity<List<OccupantResponse>> getAllOccupantsOfSpecificHouse(@RequestBody HouseRequest houseRequest) {
         //checks if this house exists
         if (!houseService.existsByHouse(houseRequest)) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.unprocessableEntity().build();
         }
         //identifies house in internal database that matches the house from request and
         //returns a list of occupants of this house
@@ -49,20 +49,16 @@ public class AssignmentController {
 
     @PutMapping(value = "/occupants/assign_specific_homeless_occupant_to_specific_house")
     public ResponseEntity<Void> assignSpecificHomelessOccupantToSpecificHouse(@RequestBody AssignmentRequest assignmentRequest) {
-        //check if target house exists
-        if (!houseService.existsByHouse(assignmentRequest.getHouseToAssign())) {
-            return ResponseEntity.badRequest().build();
-        }
-        //check if target occupant exists
-        if (!occupantService.existsByOccupant(assignmentRequest.getOccupantToAssign())) {
-            return ResponseEntity.badRequest().build();
+        //check if target house exists and target occupant exists
+        if (houseOrOccupantDontExist(assignmentRequest)) {
+            return ResponseEntity.unprocessableEntity().build();
         }
         //check if house has spare capacity
         if (houseService.houseHasSpareCapacity(assignmentRequest.getHouseToAssign())) {
             //check if the occupant already had a house before
             if (assignmentService.
                     houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()) != null) {
-                return ResponseEntity.badRequest().build();
+                return ResponseEntity.unprocessableEntity().build();
             }
             //TODO: check against gender mixing
             //assign the occupant from request to the house from request
@@ -71,31 +67,18 @@ public class AssignmentController {
             houseService.increaseHouseCurrentCapacityByOne(assignmentRequest.getHouseToAssign());
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.unprocessableEntity().build();
     }
 
     @PutMapping(value = "/occupants/move_occupant_to_different_house")
     public ResponseEntity<Void> moveSpecificOccupantToDifferentHouse(@RequestBody AssignmentRequest assignmentRequest) {
-        //check if target house exists
-        if (!houseService.existsByHouse(assignmentRequest.getHouseToAssign())) {
-            return ResponseEntity.badRequest().build();
+        //check if target house exists and target occupant exists
+        if (houseOrOccupantDontExist(assignmentRequest)) {
+            return ResponseEntity.unprocessableEntity().build();
         }
-        //check if target occupant exists
-        if (!occupantService.existsByOccupant(assignmentRequest.getOccupantToAssign())) {
-            return ResponseEntity.badRequest().build();
-        }
-        //check if target occupant has a house
-        if (assignmentService.houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()) == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        //check if target house is the same as old house
-        if (assignmentService.houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()).toString()
-                .equals(assignmentRequest.getHouseToAssign().toString())) {
-            return ResponseEntity.badRequest().build();
-        }
-        //check if house has spare capacity
-        if (!houseService.houseHasSpareCapacity(assignmentRequest.getHouseToAssign())) {
-            return ResponseEntity.badRequest().build();
+        //check if target occupant has a house that is different from current house and has spare capacity
+        if (houseSpecifiedIncorrectly(assignmentRequest)) {
+            return ResponseEntity.unprocessableEntity().build();
         }
         //TODO: check against gender mixing
         //identify the old House of the Occupant and map it onto House Request
@@ -125,6 +108,19 @@ public class AssignmentController {
         }
         occupantService.deleteOccupantFromDatabase(occupantToBeDeleted);
         return ResponseEntity.ok().build();
+    }
+
+    private boolean houseOrOccupantDontExist(AssignmentRequest assignmentRequest) {
+        return !houseService.existsByHouse(assignmentRequest.getHouseToAssign())
+                || !occupantService.existsByOccupant(assignmentRequest.getOccupantToAssign());
+
+    }
+
+    private boolean houseSpecifiedIncorrectly(AssignmentRequest assignmentRequest) {
+        return assignmentService.houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()) == null
+                || assignmentService.houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()).toString()
+                .equals(assignmentRequest.getHouseToAssign().toString())
+                || !houseService.houseHasSpareCapacity(assignmentRequest.getHouseToAssign());
     }
 }
 

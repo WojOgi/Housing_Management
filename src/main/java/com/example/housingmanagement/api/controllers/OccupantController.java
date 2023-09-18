@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+@RestController(value = "/occupants")
 public class OccupantController {
     private final OccupantService occupantService;
     private final OccupantMapperInterface occupantMapper;
@@ -22,26 +22,30 @@ public class OccupantController {
         this.occupantMapper = occupantMapper;
     }
 
-    @GetMapping(value = "/occupants")
+    @GetMapping
     public ResponseEntity<List<OccupantResponse>> getAllOccupants() {
         List<OccupantResponse> occupantResponseList = occupantMapper.toOccupantResponse(occupantService.fetchAll());
         return ResponseEntity.ok().body(occupantResponseList);
     }
 
-    @PostMapping(value = "/occupants/add_occupant_without_house")
+    @PostMapping
     public ResponseEntity<Void> addOccupantWithoutHouse(@RequestBody OccupantRequest occupantToBeAddedWithoutHouse) {
         //check if such Occupant already exists
         if (occupantService.existsByOccupant(occupantToBeAddedWithoutHouse)) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.unprocessableEntity().build();
         }
         //check if Gender is specified correctly
-        if (!(occupantService.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("M")
-                ||
-                occupantService.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("F"))) {
-            return ResponseEntity.badRequest().build();
+        if (genderSpecifiedIncorrectly(occupantToBeAddedWithoutHouse)) {
+            return ResponseEntity.unprocessableEntity().build();
         }
         //add Occupant to Database
         occupantService.addOccupantToDatabase(occupantMapper.toOccupantInternalEntity(occupantToBeAddedWithoutHouse));
         return ResponseEntity.ok().build();
+    }
+
+    private boolean genderSpecifiedIncorrectly(OccupantRequest occupantToBeAddedWithoutHouse) {
+        return !(occupantService.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("M")
+                ||
+                occupantService.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("F"));
     }
 }
