@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class AssignmentController {
@@ -43,7 +42,7 @@ public class AssignmentController {
         List<OccupantResponse> occupantResponseList =
                 occupantMapper.toOccupantResponse(
                         assignmentService.getOccupantsAssignedToThisHouseIntEnt(
-                                Optional.ofNullable(houseMapper.toHouseInternalEntity(houseRequest))));
+                                houseMapper.toHouseInternalEntity(houseRequest)));
         return ResponseEntity.ok().body(occupantResponseList);
     }
 

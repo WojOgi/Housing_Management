@@ -9,7 +9,9 @@ import com.example.housingmanagement.api.requests.OccupantRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AssignmentService {
@@ -23,27 +25,19 @@ public class AssignmentService {
         this.occupantRepository = occupantRepository;
     }
 
-    public List<OccupantInternalEntity> getOccupantsAssignedToThisHouseIntEnt(Optional<HouseInternalEntity> houseInternalEntity) {
-        List<OccupantInternalEntity> allOccupants = occupantRepository.findAll();
-
-        List<OccupantInternalEntity> occupantsWithAnyHouseAssigned =
-                allOccupants.stream().filter(x -> x.getHouseInternalEntity() != null).toList();
-
-        return houseInternalEntity
-                .map(internalEntity -> occupantsWithAnyHouseAssigned.stream()
-                        .filter(x -> x.getHouseInternalEntity().getHouseNumber()
-                                .equals(internalEntity.getHouseNumber())).toList()).orElse(occupantsWithAnyHouseAssigned);
+    public List<OccupantInternalEntity> getOccupantsAssignedToThisHouseIntEnt(HouseInternalEntity houseInternalEntity) {
+        if (Objects.isNull(houseInternalEntity)) {
+            return List.of();
+        }
+        return occupantRepository.findAll().stream()
+                .filter(it -> it.getHouseInternalEntity() != null)
+                .filter(it -> it.getHouseInternalEntity().getHouseNumber().equals(houseInternalEntity.getHouseNumber()))
+                .collect(Collectors.toList());
     }
 
     public HouseInternalEntity houseCurrentlyAssignedToThisOccupant(OccupantRequest occupantRequest) {
-        Optional<OccupantInternalEntity> occupantToCheckIfHasHouseAssigned =
-                Optional.ofNullable(occupantRepository.findByFirstNameAndLastName(occupantRequest.getFirstName(),
-                        occupantRequest.getLastName()));
-        //potentially method to be extracted
-        if (occupantExistsButHouseDoesNot(occupantToCheckIfHasHouseAssigned)) {
-            return null;
-        }
-        return occupantToCheckIfHasHouseAssigned
+        return Optional.ofNullable(occupantRepository.findByFirstNameAndLastName(occupantRequest.getFirstName(), occupantRequest.getLastName()))
+                .filter(it -> Objects.nonNull(it.getHouseInternalEntity()))
                 .map(OccupantInternalEntity::getHouseInternalEntity)
                 .orElse(null);
     }
