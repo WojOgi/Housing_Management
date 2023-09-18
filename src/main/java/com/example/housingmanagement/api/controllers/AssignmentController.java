@@ -72,11 +72,8 @@ public class AssignmentController {
     @PutMapping(value = "/occupants/move_occupant_to_different_house")
     public ResponseEntity<Void> moveSpecificOccupantToDifferentHouse(@RequestBody AssignmentRequest assignmentRequest) {
         //check if target house exists and target occupant exists
-        if (houseOrOccupantDontExist(assignmentRequest)) {
-            return ResponseEntity.unprocessableEntity().build();
-        }
         //check if target occupant has a house that is different from current house and has spare capacity
-        if (houseSpecifiedIncorrectly(assignmentRequest)) {
+        if (houseOrOccupantDontExist(assignmentRequest) || houseSpecifiedIncorrectly(assignmentRequest)) {
             return ResponseEntity.unprocessableEntity().build();
         }
         //TODO: check against gender mixing

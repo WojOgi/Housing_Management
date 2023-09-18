@@ -27,7 +27,6 @@ public class HouseMapper implements HouseMapperInterface {
 
     @Override
     public HouseInternalEntity toHouseInternalEntity(HouseRequest request) {
-        return new HouseInternalEntity(request.getHouseNumber(),
-                request.getMaxCapacity(), 0);
+        return new HouseInternalEntity(request.getHouseNumber(), request.getMaxCapacity(), 0);
     }
 }

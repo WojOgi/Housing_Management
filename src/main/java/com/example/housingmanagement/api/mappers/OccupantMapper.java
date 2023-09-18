@@ -21,7 +21,6 @@ public class OccupantMapper implements OccupantMapperInterface {
 
     @Override
     public OccupantInternalEntity toOccupantInternalEntity(OccupantRequest request) {
-        return new OccupantInternalEntity(request.getFirstName(), request.getLastName()
-                , request.getGender());
+        return new OccupantInternalEntity(request.getFirstName(), request.getLastName(), request.getGender());
     }
 }
