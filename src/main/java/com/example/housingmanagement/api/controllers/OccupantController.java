@@ -5,10 +5,7 @@ import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
 import com.example.housingmanagement.api.services.OccupantService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,6 +13,7 @@ import static com.example.housingmanagement.api.dbentities.Gender.FEMALE;
 import static com.example.housingmanagement.api.dbentities.Gender.MALE;
 
 @RestController
+@RequestMapping(value = "/occupants")
 public class OccupantController {
     private final OccupantService occupantService;
     private final OccupantMapperInterface occupantMapper;
@@ -26,13 +24,13 @@ public class OccupantController {
         this.occupantMapper = occupantMapper;
     }
 
-    @GetMapping(value = "/occupants")
+    @GetMapping
     public ResponseEntity<List<OccupantResponse>> getAllOccupants() {
         List<OccupantResponse> occupantResponseList = occupantMapper.toOccupantResponse(occupantService.fetchAll());
         return ResponseEntity.ok().body(occupantResponseList);
     }
 
-    @PostMapping(value = "/occupants")
+    @PostMapping
     public ResponseEntity<Void> addOccupantWithoutHouse(@RequestBody OccupantRequest occupantToBeAddedWithoutHouse) {
         //check if such Occupant already exists
         if (occupantService.existsByOccupant(occupantToBeAddedWithoutHouse)) {
