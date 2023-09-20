@@ -43,9 +43,8 @@ public class OccupantController {
         return ResponseEntity.ok().build();
     }
 
-    private boolean genderSpecifiedIncorrectly(OccupantRequest occupantToBeAddedWithoutHouse) {
-        return !(occupantService.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("M")
-                ||
-                occupantService.retrieveOccupantGenderFromRequest(occupantToBeAddedWithoutHouse).equals("F"));
+    private boolean genderSpecifiedIncorrectly(OccupantRequest occupantRequest) {
+        return !SUPPORTED_GENDERS.contains(occupantRequest.getGender());
     }
+    private static final List<String> SUPPORTED_GENDERS = List.of("M", "F");
 }
