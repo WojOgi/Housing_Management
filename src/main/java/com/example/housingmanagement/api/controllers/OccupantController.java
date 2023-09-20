@@ -14,8 +14,10 @@ import java.util.List;
 
 @RestController(value = "/occupants")
 public class OccupantController {
+    private static final List<String> SUPPORTED_GENDERS = List.of("M", "F");
     private final OccupantService occupantService;
     private final OccupantMapperInterface occupantMapper;
+
 
     public OccupantController(OccupantService occupantService, OccupantMapperInterface occupantMapper) {
         this.occupantService = occupantService;
@@ -42,9 +44,7 @@ public class OccupantController {
         occupantService.addOccupantToDatabase(occupantMapper.toOccupantInternalEntity(occupantToBeAddedWithoutHouse));
         return ResponseEntity.ok().build();
     }
-
     private boolean genderSpecifiedIncorrectly(OccupantRequest occupantRequest) {
         return !SUPPORTED_GENDERS.contains(occupantRequest.getGender());
     }
-    private static final List<String> SUPPORTED_GENDERS = List.of("M", "F");
 }
