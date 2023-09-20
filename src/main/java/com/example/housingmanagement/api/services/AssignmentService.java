@@ -42,11 +42,6 @@ public class AssignmentService {
                 .orElse(null);
     }
 
-    private static boolean occupantExistsButHouseDoesNot(Optional<OccupantInternalEntity> occupantToCheckIfHasHouseAssigned) {
-        return occupantToCheckIfHasHouseAssigned.isPresent() &&
-                occupantToCheckIfHasHouseAssigned.get().getHouseInternalEntity() == null;
-    }
-
     public void assignSpecificOccupantToSpecificHouse(HouseRequest houseRequest, OccupantRequest occupantRequest) {
         //identify House
         Optional<HouseInternalEntity> houseInternalEntityToAssign =

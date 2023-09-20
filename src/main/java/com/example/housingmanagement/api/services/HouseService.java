@@ -32,10 +32,6 @@ public class HouseService {
         houseRepository.deleteByHouseNumber(houseRequest.getHouseNumber());
     }
 
-    public HouseInternalEntity identifyHouseInternalEntity(HouseRequest houseRequest) {
-        return houseRepository.findByHouseNumber(houseRequest.getHouseNumber());
-    }
-
     public int houseCurrentCapacity(HouseRequest houseRequest) {
         return houseRepository.findByHouseNumber(houseRequest.getHouseNumber()).getCurrentCapacity();
     }
