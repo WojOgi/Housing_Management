@@ -1,5 +1,6 @@
 package com.example.housingmanagement.api.controllers;
 
+import com.example.housingmanagement.api.dbentities.Gender;
 import com.example.housingmanagement.api.mappers.OccupantMapperInterface;
 import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
@@ -17,6 +18,8 @@ import static com.example.housingmanagement.api.dbentities.Gender.MALE;
 public class OccupantController {
     private final OccupantService occupantService;
     private final OccupantMapperInterface occupantMapper;
+
+    private static final List<Gender> SUPPORTED_GENDERS = List.of(MALE, FEMALE);
 
     public OccupantController(OccupantService occupantService, OccupantMapperInterface occupantMapper) {
         this.occupantService = occupantService;
@@ -45,7 +48,7 @@ public class OccupantController {
     }
 
     private boolean genderSpecifiedCorrectly(OccupantRequest occupantRequest) {
-        return (occupantRequest.getGender() != MALE) || (occupantRequest.getGender() != FEMALE);
+        return SUPPORTED_GENDERS.contains(occupantRequest.getGender());
     }
 }
 
