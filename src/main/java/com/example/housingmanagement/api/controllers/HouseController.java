@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController(value = "/housing")
+@RestController
+@RequestMapping(value = "/houses")
 public class HouseController {
     private final HouseService houseService;
     private final HouseMapperInterface houseMapper;

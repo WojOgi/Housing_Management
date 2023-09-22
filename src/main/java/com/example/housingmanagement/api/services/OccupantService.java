@@ -26,14 +26,6 @@ public class OccupantService {
                 occupantRequest.getFirstName(), occupantRequest.getLastName());
     }
 
-    public String retrieveOccupantGenderFromRequest(OccupantRequest occupantRequest) {
-        return occupantRequest.getGender();
-    }
-
-    public String retrieveOccupantGenderFromInternalEntity(OccupantInternalEntity occupantInternalEntity) {
-        return occupantInternalEntity.getGender();
-    }
-
     public void addOccupantToDatabase(OccupantInternalEntity occupantInternalEntity) {
         occupantRepository.save(occupantInternalEntity);
     }

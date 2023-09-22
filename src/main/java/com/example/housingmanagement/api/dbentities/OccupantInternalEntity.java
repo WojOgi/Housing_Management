@@ -1,7 +1,6 @@
 package com.example.housingmanagement.api.dbentities;
 
 
-import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,21 +10,22 @@ public class OccupantInternalEntity {
     private int id;
     private String firstName;
     private String lastName;
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
     @ManyToOne
-    @JoinColumn(name = "house Address")
+    @JoinColumn(name = "Home Address")
     private HouseInternalEntity houseInternalEntity;
 
     public OccupantInternalEntity() {
     }
 
-    public OccupantInternalEntity(String firstName, String lastName, String gender) {
+    public OccupantInternalEntity(String firstName, String lastName, Gender gender) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
     }
 
-    public OccupantInternalEntity(int id, String firstName, String lastName, String gender, HouseInternalEntity houseInternalEntity) {
+    public OccupantInternalEntity(int id, String firstName, String lastName, Gender gender, HouseInternalEntity houseInternalEntity) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -53,11 +53,11 @@ public class OccupantInternalEntity {
         this.lastName = lastName;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 

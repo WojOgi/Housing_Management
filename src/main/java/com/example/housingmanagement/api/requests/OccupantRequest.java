@@ -1,14 +1,14 @@
 package com.example.housingmanagement.api.requests;
 
-import java.util.Objects;
+import com.example.housingmanagement.api.dbentities.Gender;
 
 public class OccupantRequest {
     private String firstName;
     private String lastName;
 
-    private final String gender;
+    private final Gender gender;
 
-    public OccupantRequest(String firstName, String lastName, String gender) {
+    public OccupantRequest(String firstName, String lastName, Gender gender) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -30,7 +30,7 @@ public class OccupantRequest {
         this.lastName = lastName;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 }

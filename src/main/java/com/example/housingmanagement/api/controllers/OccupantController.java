@@ -5,19 +5,18 @@ import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
 import com.example.housingmanagement.api.services.OccupantService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController(value = "/occupants")
+import static com.example.housingmanagement.api.dbentities.Gender.FEMALE;
+import static com.example.housingmanagement.api.dbentities.Gender.MALE;
+
+@RestController
+@RequestMapping(value = "/occupants")
 public class OccupantController {
-    private static final List<String> SUPPORTED_GENDERS = List.of("M", "F");
     private final OccupantService occupantService;
     private final OccupantMapperInterface occupantMapper;
-
 
     public OccupantController(OccupantService occupantService, OccupantMapperInterface occupantMapper) {
         this.occupantService = occupantService;
@@ -37,15 +36,16 @@ public class OccupantController {
             return ResponseEntity.unprocessableEntity().build();
         }
         //check if Gender is specified correctly
-        if (genderSpecifiedIncorrectly(occupantToBeAddedWithoutHouse)) {
+        if (!genderSpecifiedCorrectly(occupantToBeAddedWithoutHouse)) {
             return ResponseEntity.unprocessableEntity().build();
         }
         //add Occupant to Database
         occupantService.addOccupantToDatabase(occupantMapper.toOccupantInternalEntity(occupantToBeAddedWithoutHouse));
         return ResponseEntity.ok().build();
     }
-    private boolean genderSpecifiedIncorrectly(OccupantRequest occupantRequest){
-        return !SUPPORTED_GENDERS.contains(occupantRequest.getGender());
+
+    private boolean genderSpecifiedCorrectly(OccupantRequest occupantRequest) {
+        return (occupantRequest.getGender() != MALE) || (occupantRequest.getGender() != FEMALE);
     }
 }
 
