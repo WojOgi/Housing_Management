@@ -13,7 +13,7 @@ public class OccupantInternalEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
     @ManyToOne
-    @JoinColumn(name = "House Address")
+    @JoinColumn(name = "Home Address")
     private HouseInternalEntity houseInternalEntity;
 
     public OccupantInternalEntity() {

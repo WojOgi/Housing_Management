@@ -18,7 +18,6 @@ public class OccupantController {
     private final OccupantService occupantService;
     private final OccupantMapperInterface occupantMapper;
 
-
     public OccupantController(OccupantService occupantService, OccupantMapperInterface occupantMapper) {
         this.occupantService = occupantService;
         this.occupantMapper = occupantMapper;
