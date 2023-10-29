@@ -12,6 +12,7 @@ public class HouseInternalEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private LocalDateTime dateCreated;
+    private LocalDateTime dateUpdated;
     private String houseNumber;
     private int maxCapacity;
     private int currentCapacity;
@@ -47,8 +48,29 @@ public class HouseInternalEntity {
         this.currentCapacity = currentCapacity;
     }
 
+    public HouseInternalEntity(int id, LocalDateTime dateCreated, LocalDateTime dateUpdated, String houseNumber, int maxCapacity, int currentCapacity) {
+        this.id = id;
+        this.dateCreated = dateCreated;
+        this.dateUpdated = dateUpdated;
+        this.houseNumber = houseNumber;
+        this.maxCapacity = maxCapacity;
+        this.currentCapacity = currentCapacity;
+    }
+
     public LocalDateTime getDateCreated() {
         return dateCreated;
+    }
+
+    public void setDateCreated(LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public LocalDateTime getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(LocalDateTime dateUpdated) {
+        this.dateUpdated = dateUpdated;
     }
 
     public int getId() {
@@ -57,10 +79,6 @@ public class HouseInternalEntity {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public void setDateCreated(LocalDateTime dateCreated) {
-        this.dateCreated = dateCreated;
     }
 
     public String getHouseNumber() {

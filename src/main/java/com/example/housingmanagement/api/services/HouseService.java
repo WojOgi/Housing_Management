@@ -7,6 +7,7 @@ import com.example.housingmanagement.api.responses.HouseResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,6 +66,7 @@ public class HouseService {
             HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
                     houseInternalEntity1.getId(),
                     houseInternalEntity1.getDateCreated(),
+                    LocalDateTime.now(),
                     houseInternalEntity1.getHouseNumber(),
                     houseInternalEntity1.getMaxCapacity(),
                     houseInternalEntity1.getCurrentCapacity());
@@ -86,6 +88,8 @@ public class HouseService {
             HouseInternalEntity houseInternalEntity1 = houseInternalEntityToDecreaseCapacityByOne.get();
             HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
                     houseInternalEntity1.getId(),
+                    houseInternalEntity1.getDateCreated(),
+                    LocalDateTime.now(),
                     houseInternalEntity1.getHouseNumber(),
                     houseInternalEntity1.getMaxCapacity(),
                     houseInternalEntity1.getCurrentCapacity());
