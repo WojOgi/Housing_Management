@@ -2,19 +2,19 @@ package com.example.housingmanagement.api.dbentities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 public class HouseInternalEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    private LocalDateTime dateCreated;
     private String houseNumber;
     private int maxCapacity;
     private int currentCapacity;
-
-    public HouseInternalEntity(String houseNumber) {
-        this.houseNumber = houseNumber;
-    }
 
     public HouseInternalEntity() {
     }
@@ -32,8 +32,27 @@ public class HouseInternalEntity {
         this.currentCapacity = currentCapacity;
     }
 
+    public HouseInternalEntity(LocalDateTime dateCreated, String houseNumber, int maxCapacity, int currentCapacity) {
+        this.dateCreated = dateCreated;
+        this.houseNumber = houseNumber;
+        this.maxCapacity = maxCapacity;
+        this.currentCapacity = currentCapacity;
+    }
+
+    public LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
+
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setDateCreated(LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
     public String getHouseNumber() {

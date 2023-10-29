@@ -1,6 +1,7 @@
 package com.example.housingmanagement.api.controllers;
 
 import com.example.housingmanagement.api.dbentities.Gender;
+import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.mappers.OccupantMapperInterface;
 import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.housingmanagement.api.dbentities.Gender.FEMALE;
 import static com.example.housingmanagement.api.dbentities.Gender.MALE;
@@ -28,8 +30,18 @@ public class OccupantController {
 
     @GetMapping
     public ResponseEntity<List<OccupantResponse>> getAllOccupants() {
-        List<OccupantResponse> occupantResponseList = occupantMapper.toOccupantResponse(occupantService.fetchAll());
+        List<OccupantResponse> occupantResponseList = occupantMapper.toOccupantResponseList(occupantService.fetchAll());
         return ResponseEntity.ok().body(occupantResponseList);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<OccupantResponse> getOccupant(@PathVariable Integer id) {
+        Optional<OccupantInternalEntity> occupantInternalEntityOptional = occupantService.findById(id);
+        if (occupantInternalEntityOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        OccupantResponse occupantResponse = occupantMapper.toOccupantResponseList(occupantInternalEntityOptional.get());
+        return ResponseEntity.ok().body(occupantResponse);
     }
 
     @PostMapping

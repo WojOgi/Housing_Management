@@ -8,7 +8,11 @@ import java.util.List;
 
 public interface HouseMapperInterface {
 
-    List<HouseResponse> toHouseResponse(List<HouseInternalEntity> allHouseInternalEntities);
+    List<HouseResponse> toHouseResponseList(List<HouseInternalEntity> allHouseInternalEntities);
 
     HouseInternalEntity toHouseInternalEntity(HouseRequest request);
+
+    HouseResponse toHouseResponse(HouseInternalEntity houseInternalEntity);
+
+
 }

@@ -40,7 +40,7 @@ public class AssignmentController {
         //identifies house in internal database that matches the house from request and
         //returns a list of occupants of this house
         List<OccupantResponse> occupantResponseList =
-                occupantMapper.toOccupantResponse(
+                occupantMapper.toOccupantResponseList(
                         assignmentService.getOccupantsAssignedToThisHouseIntEnt(
                                 houseMapper.toHouseInternalEntity(houseRequest)));
         return ResponseEntity.ok().body(occupantResponseList);

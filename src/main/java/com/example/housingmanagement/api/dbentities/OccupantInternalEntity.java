@@ -3,11 +3,14 @@ package com.example.housingmanagement.api.dbentities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class OccupantInternalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    private LocalDateTime dateCreated;
     private String firstName;
     private String lastName;
     @Enumerated(EnumType.STRING)
@@ -33,8 +36,23 @@ public class OccupantInternalEntity {
         this.houseInternalEntity = houseInternalEntity;
     }
 
+    public OccupantInternalEntity(LocalDateTime dateCreated, String firstName, String lastName, Gender gender) {
+        this.dateCreated = dateCreated;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+    }
+
     public int getId() {
         return id;
+    }
+
+    public LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
     public String getFirstName() {

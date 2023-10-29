@@ -3,6 +3,7 @@ package com.example.housingmanagement.api.services;
 import com.example.housingmanagement.api.HouseRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
+import com.example.housingmanagement.api.responses.HouseResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,9 @@ public class HouseService {
 
     public void addHouseToDatabase(HouseInternalEntity houseInternalEntity) {
         houseRepository.save(houseInternalEntity);
+    }
+    public Optional<HouseInternalEntity> findById(Integer iD){
+        return houseRepository.findById(iD);
     }
 
     @Transactional
