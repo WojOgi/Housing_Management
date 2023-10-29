@@ -64,6 +64,7 @@ public class HouseService {
             HouseInternalEntity houseInternalEntity1 = houseInternalEntityToIncreaseCapacityByOne.get();
             HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
                     houseInternalEntity1.getId(),
+                    houseInternalEntity1.getDateCreated(),
                     houseInternalEntity1.getHouseNumber(),
                     houseInternalEntity1.getMaxCapacity(),
                     houseInternalEntity1.getCurrentCapacity());

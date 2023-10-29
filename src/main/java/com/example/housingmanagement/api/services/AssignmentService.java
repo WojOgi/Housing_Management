@@ -57,6 +57,7 @@ public class AssignmentService {
             OccupantInternalEntity occupantInternalEntityToBeModified =
                     new OccupantInternalEntity(
                             occupantInternalEntity.getId(),
+                            occupantInternalEntity.getDateCreated(),
                             occupantInternalEntity.getFirstName(),
                             occupantInternalEntity.getLastName(),
                             occupantInternalEntity.getGender(),

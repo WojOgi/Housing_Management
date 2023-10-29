@@ -39,6 +39,14 @@ public class HouseInternalEntity {
         this.currentCapacity = currentCapacity;
     }
 
+    public HouseInternalEntity(int id, LocalDateTime dateCreated, String houseNumber, int maxCapacity, int currentCapacity) {
+        this.id = id;
+        this.dateCreated = dateCreated;
+        this.houseNumber = houseNumber;
+        this.maxCapacity = maxCapacity;
+        this.currentCapacity = currentCapacity;
+    }
+
     public LocalDateTime getDateCreated() {
         return dateCreated;
     }

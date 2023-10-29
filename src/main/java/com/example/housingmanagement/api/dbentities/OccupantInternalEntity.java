@@ -43,6 +43,16 @@ public class OccupantInternalEntity {
         this.gender = gender;
     }
 
+    public OccupantInternalEntity(int id, LocalDateTime dateCreated, String firstName, String lastName,
+                                  Gender gender, HouseInternalEntity houseInternalEntity) {
+        this.id = id;
+        this.dateCreated = dateCreated;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.houseInternalEntity = houseInternalEntity;
+    }
+
     public int getId() {
         return id;
     }
