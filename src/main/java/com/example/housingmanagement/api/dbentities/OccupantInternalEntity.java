@@ -11,6 +11,7 @@ public class OccupantInternalEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private LocalDateTime dateCreated;
+    private LocalDateTime dateUpdated;
     private String firstName;
     private String lastName;
     @Enumerated(EnumType.STRING)
@@ -53,6 +54,17 @@ public class OccupantInternalEntity {
         this.houseInternalEntity = houseInternalEntity;
     }
 
+    public OccupantInternalEntity(int id, LocalDateTime dateCreated, LocalDateTime dateUpdated, String firstName, String lastName,
+                                  Gender gender, HouseInternalEntity houseInternalEntity) {
+        this.id = id;
+        this.dateCreated = dateCreated;
+        this.dateUpdated = dateUpdated;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.houseInternalEntity = houseInternalEntity;
+    }
+
     public int getId() {
         return id;
     }
@@ -63,6 +75,14 @@ public class OccupantInternalEntity {
 
     public void setDateCreated(LocalDateTime dateCreated) {
         this.dateCreated = dateCreated;
+    }
+
+    public LocalDateTime getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(LocalDateTime dateUpdated) {
+        this.dateUpdated = dateUpdated;
     }
 
     public String getFirstName() {

@@ -8,6 +8,7 @@ import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.requests.OccupantRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,6 +59,7 @@ public class AssignmentService {
                     new OccupantInternalEntity(
                             occupantInternalEntity.getId(),
                             occupantInternalEntity.getDateCreated(),
+                            LocalDateTime.now(),
                             occupantInternalEntity.getFirstName(),
                             occupantInternalEntity.getLastName(),
                             occupantInternalEntity.getGender(),
