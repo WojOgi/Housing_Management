@@ -81,7 +81,7 @@ public class HouseService {
                 Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
 
         houseInternalEntityToDecreaseCapacityByOne
-                .ifPresent(houseInternalEntity -> houseInternalEntity.setCurrentCapacity(houseInternalEntity.getCurrentCapacity() + 1));
+                .ifPresent(houseInternalEntity -> houseInternalEntity.setCurrentCapacity(houseInternalEntity.getCurrentCapacity() - 1));
 
         if (houseInternalEntityToDecreaseCapacityByOne.isPresent()) {
 

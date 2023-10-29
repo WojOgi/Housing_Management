@@ -5,6 +5,7 @@ import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,7 +29,7 @@ public class HouseMapper implements HouseMapperInterface {
 
     @Override
     public HouseInternalEntity toHouseInternalEntity(HouseRequest request) {
-        return new HouseInternalEntity(request.getHouseNumber(), request.getMaxCapacity(), 0);
+        return new HouseInternalEntity(LocalDateTime.now(), request.getHouseNumber(), request.getMaxCapacity(), 0);
     }
 
     @Override

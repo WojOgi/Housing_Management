@@ -5,6 +5,7 @@ import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public class OccupantMapper implements OccupantMapperInterface {
 
     @Override
     public OccupantInternalEntity toOccupantInternalEntity(OccupantRequest request) {
-        return new OccupantInternalEntity(request.getFirstName(), request.getLastName(), request.getGender());
+        return new OccupantInternalEntity(LocalDateTime.now(), request.getFirstName(), request.getLastName(), request.getGender());
     }
 
     @Override
