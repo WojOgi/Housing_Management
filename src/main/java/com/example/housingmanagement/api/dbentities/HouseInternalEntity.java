@@ -3,7 +3,6 @@ package com.example.housingmanagement.api.dbentities;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 public class HouseInternalEntity {
@@ -11,10 +10,17 @@ public class HouseInternalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @Column(name = "Date Created")
     private LocalDateTime dateCreated;
+
+    @Column(name = "Date Updated")
     private LocalDateTime dateUpdated;
+
+    @Column(name = "House Number")
     private String houseNumber;
+    @Column(name = "Maximum Capacity")
     private int maxCapacity;
+    @Column(name = "Current Capacity")
     private int currentCapacity;
 
     public HouseInternalEntity() {

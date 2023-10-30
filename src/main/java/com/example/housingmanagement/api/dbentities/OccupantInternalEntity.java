@@ -10,14 +10,19 @@ public class OccupantInternalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @Column(name = "Date Created")
     private LocalDateTime dateCreated;
+    @Column(name = "Date Updated")
     private LocalDateTime dateUpdated;
+    @Column(name = "First Name")
     private String firstName;
+    @Column(name = "Last Name")
     private String lastName;
     @Enumerated(EnumType.STRING)
+    @Column(name = "Gender")
     private Gender gender;
     @ManyToOne
-    @JoinColumn(name = "Home Address")
+    @JoinColumn(name = "House Assigned")
     private HouseInternalEntity houseInternalEntity;
 
     public OccupantInternalEntity() {
