@@ -39,6 +39,9 @@ class HouseMapperTest {
         Assertions.assertTrue(response.isEmpty());
     }
 
+
+
+
     @Test
     @DisplayName("Display name of test3")
     void test3() {
