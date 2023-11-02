@@ -3,7 +3,6 @@ package com.example.housingmanagement.api.services;
 import com.example.housingmanagement.api.OccupantRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.requests.OccupantRequest;
-import com.example.housingmanagement.api.responses.OccupantResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +31,7 @@ public class OccupantService {
         occupantRepository.save(occupantInternalEntity);
     }
 
-    public Optional<OccupantInternalEntity> findById(Integer iD){
+    public Optional<OccupantInternalEntity> findById(Integer iD) {
         return occupantRepository.findById(iD);
     }
 
@@ -42,4 +41,7 @@ public class OccupantService {
     }
 
 
+    public OccupantInternalEntity findByFirstAndLastName(String firstName, String lastName) {
+        return occupantRepository.findByFirstNameAndLastName(firstName, lastName);
+    }
 }

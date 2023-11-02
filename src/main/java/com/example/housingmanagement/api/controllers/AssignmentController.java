@@ -1,5 +1,8 @@
 package com.example.housingmanagement.api.controllers;
 
+import com.example.housingmanagement.api.dbentities.Gender;
+import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
+import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.mappers.HouseMapperInterface;
 import com.example.housingmanagement.api.mappers.OccupantMapperInterface;
 import com.example.housingmanagement.api.requests.AssignmentRequest;
@@ -59,12 +62,22 @@ public class AssignmentController {
                     houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()) != null) {
                 return ResponseEntity.unprocessableEntity().build();
             }
-            //TODO: check against gender mixing
-            //assign the occupant from request to the house from request
-            assignmentService.assignSpecificOccupantToSpecificHouse(assignmentRequest.getHouseToAssign(), assignmentRequest.getOccupantToAssign());
-            //increase the capacity of the house from request by one
-            houseService.increaseHouseCurrentCapacityByOne(assignmentRequest.getHouseToAssign());
-            return ResponseEntity.ok().build();
+            HouseInternalEntity houseInternalEntity = getHouseInternalEntity(assignmentRequest);
+            List<OccupantInternalEntity> occupantInternalEntityList = assignmentService.getOccupantsAssignedToThisHouseIntEnt(houseInternalEntity);
+            List<Gender> genderList = occupantInternalEntityList.stream()
+                    .map(OccupantInternalEntity::getGender)
+                    .toList();
+            OccupantInternalEntity occupantInternalEntity = occupantService.findByFirstAndLastName(assignmentRequest.getOccupantToAssign()
+                    .getFirstName(), assignmentRequest.getOccupantToAssign().getLastName());
+
+            if (genderList.isEmpty() || genderList.contains(occupantInternalEntity.getGender())) {
+                //assign the occupant from request to the house from request
+                assignmentService.assignSpecificOccupantToSpecificHouse(assignmentRequest.getHouseToAssign(), assignmentRequest.getOccupantToAssign());
+                //increase the capacity of the house from request by one
+                houseService.increaseHouseCurrentCapacityByOne(assignmentRequest.getHouseToAssign());
+                return ResponseEntity.ok().build();
+            }
+
         }
         return ResponseEntity.unprocessableEntity().build();
     }
@@ -77,6 +90,8 @@ public class AssignmentController {
             return ResponseEntity.unprocessableEntity().build();
         }
         //TODO: check against gender mixing
+
+
         //identify the old House of the Occupant and map it onto House Request
         HouseRequest oldHouseOfTheOccupantMappedToHouseRequest =
                 new HouseRequest(assignmentService.houseCurrentlyAssignedToThisOccupant(
@@ -104,6 +119,11 @@ public class AssignmentController {
         }
         occupantService.deleteOccupantFromDatabase(occupantToBeDeleted);
         return ResponseEntity.ok().build();
+    }
+
+    private HouseInternalEntity getHouseInternalEntity(AssignmentRequest assignmentRequest) {
+        HouseInternalEntity houseInternalEntity = houseMapper.toHouseInternalEntity(assignmentRequest.getHouseToAssign());
+        return houseInternalEntity;
     }
 
     private boolean houseOrOccupantDontExist(AssignmentRequest assignmentRequest) {
