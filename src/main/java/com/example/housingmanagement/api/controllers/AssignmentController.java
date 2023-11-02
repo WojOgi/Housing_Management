@@ -90,6 +90,7 @@ public class AssignmentController {
             return ResponseEntity.unprocessableEntity().build();
         }
         //TODO: check against gender mixing
+        //TODO: missing check if house has spare capacity
 
 
         //identify the old House of the Occupant and map it onto House Request
