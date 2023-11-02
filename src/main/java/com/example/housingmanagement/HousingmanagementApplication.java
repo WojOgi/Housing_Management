@@ -10,4 +10,5 @@ public class HousingmanagementApplication {
         SpringApplication.run(HousingmanagementApplication.class, args);
     }
 
+
 }

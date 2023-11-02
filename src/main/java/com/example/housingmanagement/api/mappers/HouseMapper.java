@@ -5,6 +5,7 @@ import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,11 +14,12 @@ import java.util.Optional;
 public class HouseMapper implements HouseMapperInterface {
 
     @Override
-    public List<HouseResponse> toHouseResponse(List<HouseInternalEntity> allHouseInternalEntities) {
+    public List<HouseResponse> toHouseResponseList(List<HouseInternalEntity> allHouseInternalEntities) {
         return Optional.ofNullable(allHouseInternalEntities).orElse(List.of()).stream()
                 .filter(Objects::nonNull)
                 .map(entity -> new HouseResponse(entity.getHouseNumber()))
                 .toList();
+
         //tutaj piszemy co robimy - nie jak robimy
         //filtrujemy wszsytkie obiekty ktore nie sa nullami
         //wrzucam do optionala coś co może być nullem - to jest lista house int ent,
@@ -27,6 +29,11 @@ public class HouseMapper implements HouseMapperInterface {
 
     @Override
     public HouseInternalEntity toHouseInternalEntity(HouseRequest request) {
-        return new HouseInternalEntity(request.getHouseNumber(), request.getMaxCapacity(), 0);
+        return new HouseInternalEntity(LocalDateTime.now(), request.getHouseNumber(), request.getMaxCapacity(), 0);
+    }
+
+    @Override
+    public HouseResponse toHouseResponse(HouseInternalEntity houseInternalEntity) {
+        return new HouseResponse(houseInternalEntity.getHouseNumber());
     }
 }

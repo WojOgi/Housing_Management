@@ -6,6 +6,7 @@ import com.example.housingmanagement.api.requests.HouseRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,10 @@ public class HouseService {
 
     public void addHouseToDatabase(HouseInternalEntity houseInternalEntity) {
         houseRepository.save(houseInternalEntity);
+    }
+
+    public Optional<HouseInternalEntity> findById(Integer iD) {
+        return houseRepository.findById(iD);
     }
 
     @Transactional
@@ -60,6 +65,8 @@ public class HouseService {
             HouseInternalEntity houseInternalEntity1 = houseInternalEntityToIncreaseCapacityByOne.get();
             HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
                     houseInternalEntity1.getId(),
+                    houseInternalEntity1.getCreated(),
+                    LocalDateTime.now(),
                     houseInternalEntity1.getHouseNumber(),
                     houseInternalEntity1.getMaxCapacity(),
                     houseInternalEntity1.getCurrentCapacity());
@@ -74,13 +81,15 @@ public class HouseService {
                 Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
 
         houseInternalEntityToDecreaseCapacityByOne
-                .ifPresent(houseInternalEntity -> houseInternalEntity.setCurrentCapacity(houseInternalEntity.getCurrentCapacity() + 1));
+                .ifPresent(houseInternalEntity -> houseInternalEntity.setCurrentCapacity(houseInternalEntity.getCurrentCapacity() - 1));
 
         if (houseInternalEntityToDecreaseCapacityByOne.isPresent()) {
 
             HouseInternalEntity houseInternalEntity1 = houseInternalEntityToDecreaseCapacityByOne.get();
             HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
                     houseInternalEntity1.getId(),
+                    houseInternalEntity1.getCreated(),
+                    LocalDateTime.now(),
                     houseInternalEntity1.getHouseNumber(),
                     houseInternalEntity1.getMaxCapacity(),
                     houseInternalEntity1.getCurrentCapacity());

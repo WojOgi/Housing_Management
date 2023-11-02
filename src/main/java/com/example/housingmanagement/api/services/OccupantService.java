@@ -3,10 +3,12 @@ package com.example.housingmanagement.api.services;
 import com.example.housingmanagement.api.OccupantRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.requests.OccupantRequest;
+import com.example.housingmanagement.api.responses.OccupantResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OccupantService {
@@ -28,6 +30,10 @@ public class OccupantService {
 
     public void addOccupantToDatabase(OccupantInternalEntity occupantInternalEntity) {
         occupantRepository.save(occupantInternalEntity);
+    }
+
+    public Optional<OccupantInternalEntity> findById(Integer iD){
+        return occupantRepository.findById(iD);
     }
 
     @Transactional

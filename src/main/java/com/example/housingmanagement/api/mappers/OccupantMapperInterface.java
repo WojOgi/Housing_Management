@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface OccupantMapperInterface {
 
-    List<OccupantResponse> toOccupantResponse(List<OccupantInternalEntity> occupantInternalEntityList);
+    List<OccupantResponse> toOccupantResponseList(List<OccupantInternalEntity> occupantInternalEntityList);
 
     OccupantInternalEntity toOccupantInternalEntity(OccupantRequest request);
+
+    OccupantResponse toOccupantResponseList(OccupantInternalEntity occupantInternalEntity);
 }

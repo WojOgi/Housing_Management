@@ -1,5 +1,6 @@
 package com.example.housingmanagement.api.controllers;
 
+import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.mappers.HouseMapperInterface;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/houses")
@@ -23,8 +25,17 @@ public class HouseController {
 
     @GetMapping
     public ResponseEntity<List<HouseResponse>> getAllHouses() {
-        List<HouseResponse> houseResponses = houseMapper.toHouseResponse(houseService.fetchAll());
+        List<HouseResponse> houseResponses = houseMapper.toHouseResponseList(houseService.fetchAll());
         return ResponseEntity.ok().body(houseResponses);
+    }
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<HouseResponse> getHouse(@PathVariable Integer id){
+        Optional<HouseInternalEntity> houseInternalEntityOptional = houseService.findById(id);
+        if(houseInternalEntityOptional.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        HouseResponse houseResponse = houseMapper.toHouseResponse(houseInternalEntityOptional.get());
+        return ResponseEntity.ok().body(houseResponse);
     }
 
     @PostMapping

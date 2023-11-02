@@ -3,30 +3,44 @@ package com.example.housingmanagement.api.dbentities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class OccupantInternalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @Column(name = "Created")
+    private LocalDateTime created;
+    @Column(name = "Updated")
+    private LocalDateTime updated;
+    @Column(name = "First Name")
     private String firstName;
+    @Column(name = "Last Name")
     private String lastName;
     @Enumerated(EnumType.STRING)
+    @Column(name = "Gender")
     private Gender gender;
     @ManyToOne
-    @JoinColumn(name = "Home Address")
+    @JoinColumn(name = "House Assigned")
     private HouseInternalEntity houseInternalEntity;
 
     public OccupantInternalEntity() {
     }
 
-    public OccupantInternalEntity(String firstName, String lastName, Gender gender) {
+    public OccupantInternalEntity(LocalDateTime created, String firstName, String lastName, Gender gender) {
+        this.created = created;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
     }
 
-    public OccupantInternalEntity(int id, String firstName, String lastName, Gender gender, HouseInternalEntity houseInternalEntity) {
+
+    public OccupantInternalEntity(int id, LocalDateTime created, LocalDateTime updated, String firstName, String lastName,
+                                  Gender gender, HouseInternalEntity houseInternalEntity) {
         this.id = id;
+        this.created = created;
+        this.updated = updated;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -35,6 +49,22 @@ public class OccupantInternalEntity {
 
     public int getId() {
         return id;
+    }
+
+    public LocalDateTime getCreated() {
+        return created;
+    }
+
+    public void setCreated(LocalDateTime dateCreated) {
+        this.created = dateCreated;
+    }
+
+    public LocalDateTime getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(LocalDateTime dateUpdated) {
+        this.updated = dateUpdated;
     }
 
     public String getFirstName() {

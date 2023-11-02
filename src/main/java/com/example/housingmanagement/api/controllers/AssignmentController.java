@@ -31,7 +31,7 @@ public class AssignmentController {
         this.occupantMapper = occupantMapper;
     }
 
-    @GetMapping(value = "/occupants_of_a_specific_house")
+    @GetMapping(value = "/occupants_of_house")
     public ResponseEntity<List<OccupantResponse>> getAllOccupantsOfSpecificHouse(@RequestBody HouseRequest houseRequest) {
         //checks if this house exists
         if (!houseService.existsByHouse(houseRequest)) {
@@ -40,13 +40,13 @@ public class AssignmentController {
         //identifies house in internal database that matches the house from request and
         //returns a list of occupants of this house
         List<OccupantResponse> occupantResponseList =
-                occupantMapper.toOccupantResponse(
+                occupantMapper.toOccupantResponseList(
                         assignmentService.getOccupantsAssignedToThisHouseIntEnt(
                                 houseMapper.toHouseInternalEntity(houseRequest)));
         return ResponseEntity.ok().body(occupantResponseList);
     }
 
-    @PutMapping(value = "/occupants/assign_specific_homeless_occupant_to_specific_house")
+    @PutMapping(value = "/occupants/assign")
     public ResponseEntity<Void> assignSpecificHomelessOccupantToSpecificHouse(@RequestBody AssignmentRequest assignmentRequest) {
         //check if target house exists and target occupant exists
         if (houseOrOccupantDontExist(assignmentRequest)) {
@@ -69,7 +69,7 @@ public class AssignmentController {
         return ResponseEntity.unprocessableEntity().build();
     }
 
-    @PutMapping(value = "/occupants/move_occupant_to_different_house")
+    @PutMapping(value = "/occupants/move")
     public ResponseEntity<Void> moveSpecificOccupantToDifferentHouse(@RequestBody AssignmentRequest assignmentRequest) {
         //check if target house exists and target occupant exists
         //check if target occupant has a house that is different from current house and has spare capacity
