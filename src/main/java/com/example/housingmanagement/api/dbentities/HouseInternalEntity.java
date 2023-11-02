@@ -10,11 +10,11 @@ public class HouseInternalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    @Column(name = "Date Created")
-    private LocalDateTime dateCreated;
+    @Column(name = "Created")
+    private LocalDateTime created;
 
-    @Column(name = "Date Updated")
-    private LocalDateTime dateUpdated;
+    @Column(name = "Updated")
+    private LocalDateTime updated;
 
     @Column(name = "House Number")
     private String houseNumber;
@@ -26,57 +26,37 @@ public class HouseInternalEntity {
     public HouseInternalEntity() {
     }
 
-    public HouseInternalEntity(int id, String houseNumber, int maxCapacity, int currentCapacity) {
+
+    public HouseInternalEntity(LocalDateTime created, String houseNumber, int maxCapacity, int currentCapacity) {
+        this.created = created;
+        this.houseNumber = houseNumber;
+        this.maxCapacity = maxCapacity;
+        this.currentCapacity = currentCapacity;
+    }
+
+    public HouseInternalEntity(int id, LocalDateTime created, LocalDateTime updated, String houseNumber, int maxCapacity, int currentCapacity) {
         this.id = id;
+        this.created = created;
+        this.updated = updated;
         this.houseNumber = houseNumber;
         this.maxCapacity = maxCapacity;
         this.currentCapacity = currentCapacity;
     }
 
-    public HouseInternalEntity(String houseNumber, int maxCapacity, int currentCapacity) {
-        this.houseNumber = houseNumber;
-        this.maxCapacity = maxCapacity;
-        this.currentCapacity = currentCapacity;
+    public LocalDateTime getCreated() {
+        return created;
     }
 
-    public HouseInternalEntity(LocalDateTime dateCreated, String houseNumber, int maxCapacity, int currentCapacity) {
-        this.dateCreated = dateCreated;
-        this.houseNumber = houseNumber;
-        this.maxCapacity = maxCapacity;
-        this.currentCapacity = currentCapacity;
+    public void setCreated(LocalDateTime dateCreated) {
+        this.created = dateCreated;
     }
 
-    public HouseInternalEntity(int id, LocalDateTime dateCreated, String houseNumber, int maxCapacity, int currentCapacity) {
-        this.id = id;
-        this.dateCreated = dateCreated;
-        this.houseNumber = houseNumber;
-        this.maxCapacity = maxCapacity;
-        this.currentCapacity = currentCapacity;
+    public LocalDateTime getUpdated() {
+        return updated;
     }
 
-    public HouseInternalEntity(int id, LocalDateTime dateCreated, LocalDateTime dateUpdated, String houseNumber, int maxCapacity, int currentCapacity) {
-        this.id = id;
-        this.dateCreated = dateCreated;
-        this.dateUpdated = dateUpdated;
-        this.houseNumber = houseNumber;
-        this.maxCapacity = maxCapacity;
-        this.currentCapacity = currentCapacity;
-    }
-
-    public LocalDateTime getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(LocalDateTime dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
-    public LocalDateTime getDateUpdated() {
-        return dateUpdated;
-    }
-
-    public void setDateUpdated(LocalDateTime dateUpdated) {
-        this.dateUpdated = dateUpdated;
+    public void setUpdated(LocalDateTime dateUpdated) {
+        this.updated = dateUpdated;
     }
 
     public int getId() {

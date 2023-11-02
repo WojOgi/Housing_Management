@@ -10,10 +10,10 @@ public class OccupantInternalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    @Column(name = "Date Created")
-    private LocalDateTime dateCreated;
-    @Column(name = "Date Updated")
-    private LocalDateTime dateUpdated;
+    @Column(name = "Created")
+    private LocalDateTime created;
+    @Column(name = "Updated")
+    private LocalDateTime updated;
     @Column(name = "First Name")
     private String firstName;
     @Column(name = "Last Name")
@@ -28,42 +28,19 @@ public class OccupantInternalEntity {
     public OccupantInternalEntity() {
     }
 
-    public OccupantInternalEntity(String firstName, String lastName, Gender gender) {
+    public OccupantInternalEntity(LocalDateTime created, String firstName, String lastName, Gender gender) {
+        this.created = created;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
     }
 
-    public OccupantInternalEntity(int id, String firstName, String lastName, Gender gender, HouseInternalEntity houseInternalEntity) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.gender = gender;
-        this.houseInternalEntity = houseInternalEntity;
-    }
 
-    public OccupantInternalEntity(LocalDateTime dateCreated, String firstName, String lastName, Gender gender) {
-        this.dateCreated = dateCreated;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.gender = gender;
-    }
-
-    public OccupantInternalEntity(int id, LocalDateTime dateCreated, String firstName, String lastName,
+    public OccupantInternalEntity(int id, LocalDateTime created, LocalDateTime updated, String firstName, String lastName,
                                   Gender gender, HouseInternalEntity houseInternalEntity) {
         this.id = id;
-        this.dateCreated = dateCreated;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.gender = gender;
-        this.houseInternalEntity = houseInternalEntity;
-    }
-
-    public OccupantInternalEntity(int id, LocalDateTime dateCreated, LocalDateTime dateUpdated, String firstName, String lastName,
-                                  Gender gender, HouseInternalEntity houseInternalEntity) {
-        this.id = id;
-        this.dateCreated = dateCreated;
-        this.dateUpdated = dateUpdated;
+        this.created = created;
+        this.updated = updated;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -74,20 +51,20 @@ public class OccupantInternalEntity {
         return id;
     }
 
-    public LocalDateTime getDateCreated() {
-        return dateCreated;
+    public LocalDateTime getCreated() {
+        return created;
     }
 
-    public void setDateCreated(LocalDateTime dateCreated) {
-        this.dateCreated = dateCreated;
+    public void setCreated(LocalDateTime dateCreated) {
+        this.created = dateCreated;
     }
 
-    public LocalDateTime getDateUpdated() {
-        return dateUpdated;
+    public LocalDateTime getUpdated() {
+        return updated;
     }
 
-    public void setDateUpdated(LocalDateTime dateUpdated) {
-        this.dateUpdated = dateUpdated;
+    public void setUpdated(LocalDateTime dateUpdated) {
+        this.updated = dateUpdated;
     }
 
     public String getFirstName() {

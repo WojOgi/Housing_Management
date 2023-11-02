@@ -6,13 +6,13 @@ public class HouseRequest {
     private String houseNumber;
     private int maxCapacity;
 
+    public HouseRequest(String houseNumber) {
+        this.houseNumber = houseNumber;
+    }
+
     public HouseRequest(String houseNumber, int maxCapacity) {
         this.houseNumber = houseNumber;
         this.maxCapacity = maxCapacity;
-    }
-
-    public HouseRequest(String houseNumber) {
-        this.houseNumber = houseNumber;
     }
 
     public String getHouseNumber() {
