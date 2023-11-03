@@ -62,13 +62,8 @@ public class AssignmentController {
                     houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()) != null) {
                 return ResponseEntity.unprocessableEntity().build();
             }
-            HouseInternalEntity houseInternalEntity = getHouseInternalEntity(assignmentRequest);
-            List<OccupantInternalEntity> occupantInternalEntityList = assignmentService.getOccupantsAssignedToThisHouseIntEnt(houseInternalEntity);
-            List<Gender> genderList = occupantInternalEntityList.stream()
-                    .map(OccupantInternalEntity::getGender)
-                    .toList();
-            OccupantInternalEntity occupantInternalEntity = occupantService.findByFirstAndLastName(assignmentRequest.getOccupantToAssign()
-                    .getFirstName(), assignmentRequest.getOccupantToAssign().getLastName());
+            List<Gender> genderList = getGenderList(assignmentRequest);
+            OccupantInternalEntity occupantInternalEntity = getOccupantInternalEntity(assignmentRequest);
 
             if (genderList.isEmpty() || genderList.contains(occupantInternalEntity.getGender())) {
                 //assign the occupant from request to the house from request
@@ -96,13 +91,8 @@ public class AssignmentController {
                     houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()) == null) {
                 return ResponseEntity.unprocessableEntity().build();
             }
-            HouseInternalEntity houseInternalEntity = getHouseInternalEntity(assignmentRequest);
-            List<OccupantInternalEntity> occupantInternalEntityList = assignmentService.getOccupantsAssignedToThisHouseIntEnt(houseInternalEntity);
-            List<Gender> genderList = occupantInternalEntityList.stream()
-                    .map(OccupantInternalEntity::getGender)
-                    .toList();
-            OccupantInternalEntity occupantInternalEntity = occupantService.findByFirstAndLastName(assignmentRequest.getOccupantToAssign()
-                    .getFirstName(), assignmentRequest.getOccupantToAssign().getLastName());
+            List<Gender> genderList = getGenderList(assignmentRequest);
+            OccupantInternalEntity occupantInternalEntity = getOccupantInternalEntity(assignmentRequest);
 
 
             if (genderList.isEmpty() || genderList.contains(occupantInternalEntity.getGender())) {
@@ -137,6 +127,21 @@ public class AssignmentController {
         }
         occupantService.deleteOccupantFromDatabase(occupantToBeDeleted);
         return ResponseEntity.ok().build();
+    }
+
+    private OccupantInternalEntity getOccupantInternalEntity(AssignmentRequest assignmentRequest) {
+        OccupantInternalEntity occupantInternalEntity = occupantService.findByFirstAndLastName(assignmentRequest.getOccupantToAssign()
+                .getFirstName(), assignmentRequest.getOccupantToAssign().getLastName());
+        return occupantInternalEntity;
+    }
+
+    private List<Gender> getGenderList(AssignmentRequest assignmentRequest) {
+        HouseInternalEntity houseInternalEntity = getHouseInternalEntity(assignmentRequest);
+        List<OccupantInternalEntity> occupantInternalEntityList = assignmentService.getOccupantsAssignedToThisHouseIntEnt(houseInternalEntity);
+        List<Gender> genderList = occupantInternalEntityList.stream()
+                .map(OccupantInternalEntity::getGender)
+                .toList();
+        return genderList;
     }
 
     private HouseInternalEntity getHouseInternalEntity(AssignmentRequest assignmentRequest) {
