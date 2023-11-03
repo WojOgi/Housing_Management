@@ -62,6 +62,14 @@ public class MyCommandLineRunner implements CommandLineRunner {
         occupantRepoCLR.save(occupant4);
         System.out.println(("Added: " + occupant4));
 
+        OccupantInternalEntity occupant5 = new OccupantInternalEntity(LocalDateTime.now(), "Lea", "Jones", Gender.FEMALE);
+        occupantRepoCLR.save(occupant5);
+        System.out.println(("Added: " + occupant5));
+
+        OccupantInternalEntity occupant6 = new OccupantInternalEntity(LocalDateTime.now(), "Mat", "Damon", Gender.MALE);
+        occupantRepoCLR.save(occupant6);
+        System.out.println(("Added: " + occupant6));
+
 
     }
 }

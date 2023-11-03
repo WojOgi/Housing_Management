@@ -89,21 +89,38 @@ public class AssignmentController {
         if (houseOrOccupantDontExist(assignmentRequest) || houseSpecifiedIncorrectly(assignmentRequest)) {
             return ResponseEntity.unprocessableEntity().build();
         }
-        //TODO: check against gender mixing
-        //TODO: missing check if house has spare capacity
+
+        if (houseService.houseHasSpareCapacity(assignmentRequest.getHouseToAssign())) {
+            //check if occupant was homeless - in such case should use /assign endpoint
+            if (assignmentService.
+                    houseCurrentlyAssignedToThisOccupant(assignmentRequest.getOccupantToAssign()) == null) {
+                return ResponseEntity.unprocessableEntity().build();
+            }
+            HouseInternalEntity houseInternalEntity = getHouseInternalEntity(assignmentRequest);
+            List<OccupantInternalEntity> occupantInternalEntityList = assignmentService.getOccupantsAssignedToThisHouseIntEnt(houseInternalEntity);
+            List<Gender> genderList = occupantInternalEntityList.stream()
+                    .map(OccupantInternalEntity::getGender)
+                    .toList();
+            OccupantInternalEntity occupantInternalEntity = occupantService.findByFirstAndLastName(assignmentRequest.getOccupantToAssign()
+                    .getFirstName(), assignmentRequest.getOccupantToAssign().getLastName());
 
 
-        //identify the old House of the Occupant and map it onto House Request
-        HouseRequest oldHouseOfTheOccupantMappedToHouseRequest =
-                new HouseRequest(assignmentService.houseCurrentlyAssignedToThisOccupant(
-                        assignmentRequest.getOccupantToAssign()).getHouseNumber());
-        //reduce the capacity of the previous house of Occupant by one
-        houseService.decreaseHouseCurrentCapacityByOne(oldHouseOfTheOccupantMappedToHouseRequest);
-        //assign the occupant from request to the house from request
-        assignmentService.assignSpecificOccupantToSpecificHouse(assignmentRequest.getHouseToAssign(), assignmentRequest.getOccupantToAssign());
-        //increase the capacity of the house from request by one
-        houseService.increaseHouseCurrentCapacityByOne(assignmentRequest.getHouseToAssign());
-        return ResponseEntity.ok().build();
+            if (genderList.isEmpty() || genderList.contains(occupantInternalEntity.getGender())) {
+
+                //identify the old House of the Occupant and map it onto House Request
+                HouseRequest oldHouseOfTheOccupantMappedToHouseRequest =
+                        new HouseRequest(assignmentService.houseCurrentlyAssignedToThisOccupant(
+                                assignmentRequest.getOccupantToAssign()).getHouseNumber());
+                //reduce the capacity of the previous house of Occupant by one
+                houseService.decreaseHouseCurrentCapacityByOne(oldHouseOfTheOccupantMappedToHouseRequest);
+                //assign the occupant from request to the house from request
+                assignmentService.assignSpecificOccupantToSpecificHouse(assignmentRequest.getHouseToAssign(), assignmentRequest.getOccupantToAssign());
+                //increase the capacity of the house from request by one
+                houseService.increaseHouseCurrentCapacityByOne(assignmentRequest.getHouseToAssign());
+                return ResponseEntity.ok().build();
+            }
+        }
+        return ResponseEntity.unprocessableEntity().build();
     }
 
     @DeleteMapping(value = "/occupants")
