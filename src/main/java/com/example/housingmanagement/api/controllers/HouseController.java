@@ -28,6 +28,14 @@ public class HouseController {
         List<HouseResponse> houseResponses = houseMapper.toHouseResponseList(houseService.fetchAll());
         return ResponseEntity.ok().body(houseResponses);
     }
+
+    @GetMapping(value = "/available")
+    public ResponseEntity<List<HouseResponse>> getAvailableHouses(){
+        List<HouseInternalEntity> listOfAvailableHouses = getListOfAvailableHouses();
+        List<HouseResponse> houseResponses = houseMapper.toHouseResponseList(listOfAvailableHouses);
+        return ResponseEntity.ok().body(houseResponses);
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<HouseResponse> getHouse(@PathVariable Integer id){
         Optional<HouseInternalEntity> houseInternalEntityOptional = houseService.findById(id);
@@ -60,6 +68,12 @@ public class HouseController {
         }
         houseService.deleteHouseFromDatabase(houseToBeDeleted);
         return ResponseEntity.ok().build();
+    }
+
+    private List<HouseInternalEntity> getListOfAvailableHouses() {
+        return houseService.fetchAll().stream()
+                .filter(houseInternalEntity -> houseInternalEntity.getCurrentCapacity() < houseInternalEntity.getMaxCapacity())
+                .toList();
     }
 
 
