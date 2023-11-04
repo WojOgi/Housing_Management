@@ -14,8 +14,8 @@ class HouseMapperTest {
     private final HouseMapper houseMapper = new HouseMapper();
 
     @Test
-    @DisplayName("Display name of test2")
-    void test1() {
+    @DisplayName("Should return empty response when null parameter was provided")
+    void test() {
         //given
         List<HouseInternalEntity> allHouseInternalEntities = null;
 
@@ -27,7 +27,7 @@ class HouseMapperTest {
     }
 
     @Test
-    @DisplayName("Display name of test2")
+    @DisplayName("Should return empty response when empty list was provided")
     void test2() {
         //given
         List<HouseInternalEntity> allHouseInternalEntities = List.of();
@@ -40,24 +40,43 @@ class HouseMapperTest {
     }
 
     @Test
-    @DisplayName("Display name of test3")
+    @DisplayName("Should successfully map provided list of houses")
     void test3() {
         //given
-        HouseInternalEntity house1 = new HouseInternalEntity("1", 1, 1);
-        HouseInternalEntity house2 = new HouseInternalEntity("2", 2, 2);
-        HouseInternalEntity house3 = new HouseInternalEntity("3", 3, 3);
-
-        ArrayList<HouseInternalEntity> arrayList = new ArrayList<>();
-        arrayList.add(house1);
-        arrayList.add(house2);
-        arrayList.add(house2);
-
+        List<HouseInternalEntity> input = List.of(
+                getHouseInternalEntity("1", 1, 1),
+                getHouseInternalEntity("2", 2, 2),
+                getHouseInternalEntity("3", 3, 3));
 
         //when
-        List<HouseResponse> response = houseMapper.toHouseResponse(arrayList);
+        List<HouseResponse> response = houseMapper.toHouseResponse(input);
 
         //then
         Assertions.assertFalse(response.isEmpty());
+        Assertions.assertEquals(3, response.size());
+        Assertions.assertEquals(response.get(0).getHouseNumber(), input.get(0).getHouseNumber());
+    }
+
+    @Test
+    @DisplayName("xxxx")
+    void test4() {
+        //given
+        List<HouseInternalEntity> input = new ArrayList<>();
+        input.add(getHouseInternalEntity("1", 1, 1));
+        input.add(null);
+
+        //when
+        List<HouseResponse> response = houseMapper.toHouseResponse(input);
+
+        //then
+        Assertions.assertFalse(response.isEmpty());
+        Assertions.assertEquals(1, response.size());
+        Assertions.assertEquals(response.get(0).getHouseNumber(), input.get(0).getHouseNumber());
+    }
+
+
+    private static HouseInternalEntity getHouseInternalEntity(String houseNumber, int maxCapacity, int currentCapacity) {
+        return new HouseInternalEntity(houseNumber, maxCapacity, currentCapacity);
     }
 
 }
