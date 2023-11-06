@@ -46,11 +46,8 @@ public class HouseService {
     }
 
     public boolean houseHasSpareCapacity(HouseRequest houseRequest) {
-        Optional<HouseInternalEntity> houseInternalEntityToBeChecked =
-                Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
-
-        return houseInternalEntityToBeChecked
-                .filter(houseInternalEntity -> houseInternalEntity.getCurrentCapacity() < houseInternalEntity.getMaxCapacity()).isPresent();
+        HouseInternalEntity houseInternalEntityToBeChecked = houseRepository.findByHouseNumber(houseRequest.getHouseNumber());
+        return houseInternalEntityToBeChecked.getCurrentCapacity() < houseInternalEntityToBeChecked.getMaxCapacity();
     }
 
     public void increaseHouseCurrentCapacityByOne(HouseRequest houseRequest) {

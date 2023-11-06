@@ -127,7 +127,6 @@ class HouseServiceTest {
     @DisplayName("Should return a current capacity of HouseInternalEntity")
     void test7() {
         //given
-
         HouseInternalEntity sampleHouseInternalEntity =
                 new HouseInternalEntity(LocalDateTime.now(), "House", 3, 0);
         Mockito.when(houseRepositoryMock
@@ -139,8 +138,57 @@ class HouseServiceTest {
         //then
         Mockito.verify(houseRepositoryMock).findByHouseNumber(houseRequest.getHouseNumber());
         assertEquals(sampleHouseInternalEntity.getCurrentCapacity(), capacity);
+    }
+    @Test
+    @DisplayName("Should return true if HouseInternalEntity exists in db")
+    void test8(){
+        //given
+        Mockito.when(houseRepositoryMock.existsByHouseNumber(houseRequest.getHouseNumber())).thenReturn(true);
+
+        //when
+        boolean exists = houseService.existsByHouse(houseRequest);
+
+        //then
+        Assertions.assertTrue(exists);
+    }
+    @Test
+    @DisplayName("Should return false if HouseInternalEntity does not exist in db")
+    void test9(){
+        //given
+        Mockito.when(houseRepositoryMock.existsByHouseNumber(houseRequest.getHouseNumber())).thenReturn(false);
+
+        //when
+        boolean exists = houseService.existsByHouse(houseRequest);
+
+        //then
+        Assertions.assertFalse(exists);
+    }
+    @Test
+    @DisplayName("Should return true if HouseInternalEntity has spare capacity")
+    void test10(){
+        //given
+        HouseInternalEntity sampleHouseInternalEntity =
+                new HouseInternalEntity(
+                        LocalDateTime.now(),
+                        "House",
+                        3,
+                        0);
+                        //HouseInternalEntity does have spare capacity
+
+        Mockito.when(houseRepositoryMock.findByHouseNumber(houseRequest.getHouseNumber())).thenReturn(sampleHouseInternalEntity);
+
+        //when
+        boolean hasSpareCapacity = houseService.houseHasSpareCapacity(houseRequest);
+
+        //then
+        Assertions.assertTrue(hasSpareCapacity);
+
 
     }
+
+
+
+
 
 
 }
