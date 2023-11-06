@@ -172,8 +172,7 @@ class HouseServiceTest {
                         LocalDateTime.now(),
                         "House",
                         3,
-                        0);
-                        //HouseInternalEntity does have spare capacity
+                        0);  //HouseInternalEntity does have spare capacity
 
         Mockito.when(houseRepositoryMock.findByHouseNumber(houseRequest.getHouseNumber())).thenReturn(sampleHouseInternalEntity);
 
@@ -182,9 +181,8 @@ class HouseServiceTest {
 
         //then
         Assertions.assertTrue(hasSpareCapacity);
-
-
     }
+
 
 
 

@@ -51,7 +51,7 @@ public class HouseService {
     }
 
     public void increaseHouseCurrentCapacityByOne(HouseRequest houseRequest) {
-
+        //TODO - here again we don't need Optionals because House existence is checked in the controller
         Optional<HouseInternalEntity> houseInternalEntityToIncreaseCapacityByOne =
                 Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
 
