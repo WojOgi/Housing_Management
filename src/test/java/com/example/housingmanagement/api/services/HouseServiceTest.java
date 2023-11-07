@@ -27,6 +27,9 @@ class HouseServiceTest {
 
     @BeforeAll
     static void beforeAll() {
+        //on a second thought - it is probably not really good to set this up - the code is much clearer
+        //when we lay out the needed object instances in each test - because in many tests we need different things
+        //not always the same - then there is no need to keep coming back to setup to check what we prepared
         listWithoutNulls.add(new HouseInternalEntity(LocalDateTime.now(), "House1", 3, 0));
         listWithoutNulls.add(new HouseInternalEntity(LocalDateTime.now(), "House2", 2, 0));
         listWithoutNulls.add(new HouseInternalEntity(LocalDateTime.now(), "House3", 1, 0));
@@ -175,7 +178,7 @@ class HouseServiceTest {
     }
 
     @Test
-    @DisplayName("Should return increase HouseInternalEntity capacity by one based on HouseRequest")
+    @DisplayName("Should increase HouseInternalEntity capacity by one based on HouseRequest")
     void test11() {
         //given
         HouseInternalEntity foundHouseInternalEntity = new HouseInternalEntity(1, LocalDateTime.now(), LocalDateTime.now(),
@@ -192,8 +195,25 @@ class HouseServiceTest {
         Mockito.verify(houseRepositoryMock).save(captor.capture());
         HouseInternalEntity updatedHouseInternalEntity = captor.getValue();
         assertEquals(foundHouseInternalEntity.getCurrentCapacity()+1,updatedHouseInternalEntity.getCurrentCapacity());
+    }
+    @Test
+    @DisplayName("Should decrease HouseInternalEntity capacity by one based on HouseRequest")
+    void test12() {
+        //given
+        HouseInternalEntity foundHouseInternalEntity = new HouseInternalEntity(1, LocalDateTime.now(), LocalDateTime.now(),
+                "House1", 3, 0);
 
+        Mockito.when(houseRepositoryMock.findByHouseNumber(sampleHouseRequest.getHouseNumber())).thenReturn(foundHouseInternalEntity);
+        ArgumentCaptor<HouseInternalEntity> captor = ArgumentCaptor.forClass(HouseInternalEntity.class);
 
+        //when
+        houseService.decreaseHouseCurrentCapacityByOne(sampleHouseRequest);
+
+        //then
+        Mockito.verify(houseRepositoryMock).findByHouseNumber(sampleHouseRequest.getHouseNumber());
+        Mockito.verify(houseRepositoryMock).save(captor.capture());
+        HouseInternalEntity updatedHouseInternalEntity = captor.getValue();
+        assertEquals(foundHouseInternalEntity.getCurrentCapacity()-1,updatedHouseInternalEntity.getCurrentCapacity());
     }
 
 
