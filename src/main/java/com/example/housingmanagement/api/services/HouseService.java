@@ -51,47 +51,32 @@ public class HouseService {
     }
 
     public void increaseHouseCurrentCapacityByOne(HouseRequest houseRequest) {
-        //TODO - here again we don't need Optionals because House existence is checked in the controller
-        Optional<HouseInternalEntity> houseInternalEntityToIncreaseCapacityByOne =
-                Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
 
-        houseInternalEntityToIncreaseCapacityByOne
-                .ifPresent(houseInternalEntity -> houseInternalEntity.setCurrentCapacity(houseInternalEntity.getCurrentCapacity() + 1));
+        HouseInternalEntity houseInternalEntityToIncreaseCapacityByOne = houseRepository.findByHouseNumber(houseRequest.getHouseNumber());
 
-        if (houseInternalEntityToIncreaseCapacityByOne.isPresent()) {
-            HouseInternalEntity houseInternalEntity1 = houseInternalEntityToIncreaseCapacityByOne.get();
-            HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
-                    houseInternalEntity1.getId(),
-                    houseInternalEntity1.getCreated(),
-                    LocalDateTime.now(),
-                    houseInternalEntity1.getHouseNumber(),
-                    houseInternalEntity1.getMaxCapacity(),
-                    houseInternalEntity1.getCurrentCapacity());
-
-            houseRepository.save(houseInternalEntity);
-        }
+        HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
+                houseInternalEntityToIncreaseCapacityByOne.getId(),
+                houseInternalEntityToIncreaseCapacityByOne.getCreated(),
+                LocalDateTime.now(),
+                houseInternalEntityToIncreaseCapacityByOne.getHouseNumber(),
+                houseInternalEntityToIncreaseCapacityByOne.getMaxCapacity(),
+                houseInternalEntityToIncreaseCapacityByOne.getCurrentCapacity() + 1
+        );
+        houseRepository.save(houseInternalEntity);
     }
 
+
     public void decreaseHouseCurrentCapacityByOne(HouseRequest houseRequest) {
+        HouseInternalEntity houseInternalEntityToIncreaseCapacityByOne = houseRepository.findByHouseNumber(houseRequest.getHouseNumber());
 
-        Optional<HouseInternalEntity> houseInternalEntityToDecreaseCapacityByOne =
-                Optional.ofNullable(houseRepository.findByHouseNumber(houseRequest.getHouseNumber()));
-
-        houseInternalEntityToDecreaseCapacityByOne
-                .ifPresent(houseInternalEntity -> houseInternalEntity.setCurrentCapacity(houseInternalEntity.getCurrentCapacity() - 1));
-
-        if (houseInternalEntityToDecreaseCapacityByOne.isPresent()) {
-
-            HouseInternalEntity houseInternalEntity1 = houseInternalEntityToDecreaseCapacityByOne.get();
-            HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
-                    houseInternalEntity1.getId(),
-                    houseInternalEntity1.getCreated(),
-                    LocalDateTime.now(),
-                    houseInternalEntity1.getHouseNumber(),
-                    houseInternalEntity1.getMaxCapacity(),
-                    houseInternalEntity1.getCurrentCapacity());
-
-            houseRepository.save(houseInternalEntity);
-        }
+        HouseInternalEntity houseInternalEntity = new HouseInternalEntity(
+                houseInternalEntityToIncreaseCapacityByOne.getId(),
+                houseInternalEntityToIncreaseCapacityByOne.getCreated(),
+                LocalDateTime.now(),
+                houseInternalEntityToIncreaseCapacityByOne.getHouseNumber(),
+                houseInternalEntityToIncreaseCapacityByOne.getMaxCapacity(),
+                houseInternalEntityToIncreaseCapacityByOne.getCurrentCapacity() - 1
+        );
+        houseRepository.save(houseInternalEntity);
     }
 }
