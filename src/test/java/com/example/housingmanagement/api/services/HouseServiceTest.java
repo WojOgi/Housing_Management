@@ -20,37 +20,19 @@ class HouseServiceTest {
     @InjectMocks
     private HouseService houseService;
 
-    private static HouseRequest sampleHouseRequest = null;
+    private LocalDateTime now = LocalDateTime.now();
 
-    private static final List<HouseInternalEntity> listWithoutNulls = new ArrayList<>();
-    private static HouseInternalEntity sampleHouseInternalEntity = null;
-
-    @BeforeAll
-    static void beforeAll() {
-        //on a second thought - it is probably not really good to set this up - the code is much clearer
-        //when we lay out the needed object instances in each test - because in many tests we need different things
-        //not always the same - then there is no need to keep coming back to setup to check what we prepared
-        listWithoutNulls.add(new HouseInternalEntity(LocalDateTime.now(), "House1", 3, 0));
-        listWithoutNulls.add(new HouseInternalEntity(LocalDateTime.now(), "House2", 2, 0));
-        listWithoutNulls.add(new HouseInternalEntity(LocalDateTime.now(), "House3", 1, 0));
-
-        sampleHouseRequest = new HouseRequest("House1");
-
-        sampleHouseInternalEntity = new HouseInternalEntity(LocalDateTime.now(), "House1", 3, 0);
-
-    }
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        // houseService = new HouseService(houseRepositoryMock);
-        //could we use @InjectMocks with private HouseService houseService? I guess so - without manual injection like line up
     }
 
     @Test
     @DisplayName("When mock returns 'true' then our service returns 'true'")
     void test1() {
         //given
+        HouseRequest sampleHouseRequest = new HouseRequest("House1");
         Mockito.when(houseRepositoryMock.existsByHouseNumber(sampleHouseRequest.getHouseNumber())).thenReturn(true);
 
         //when
@@ -64,6 +46,7 @@ class HouseServiceTest {
     @DisplayName("When mock returns 'false' then our service returns 'false'")
     void test2() {
         //given
+        HouseRequest sampleHouseRequest = new HouseRequest("House1");
         Mockito.when(houseRepositoryMock.existsByHouseNumber(sampleHouseRequest.getHouseNumber())).thenReturn(false);
 
         //when
@@ -77,6 +60,8 @@ class HouseServiceTest {
     @DisplayName("Should return a list of HouseInternalEntity after calling a method fetchAll()")
     void test3() {
         //given
+        List<HouseInternalEntity> listWithoutNulls = List.of(
+                new HouseInternalEntity(now, "House1", 3, 0));
         Mockito.when(houseRepositoryMock.findAll()).thenReturn(listWithoutNulls);
 
         //when
@@ -90,7 +75,7 @@ class HouseServiceTest {
     @DisplayName("Should call a method save from houseRepository when method addHouseToDatabase is called")
     void test4() {
         //given
-        HouseInternalEntity sampleHouse = sampleHouseInternalEntity;
+        HouseInternalEntity sampleHouse = new HouseInternalEntity(now, "House1", 3, 0);
 
         //when
         houseService.addHouseToDatabase(sampleHouse);
@@ -103,23 +88,27 @@ class HouseServiceTest {
     @DisplayName("Should return an Optional<HouseInternalEntity> when method findById is called")
     void test5() {
         //given
+        HouseInternalEntity sampleHouseInternalEntity =
+                new HouseInternalEntity(now, "House1", 3, 0);
         Mockito.when(houseRepositoryMock.findById(0)).thenReturn(Optional.of(sampleHouseInternalEntity));
 
         //when
-        Optional<HouseInternalEntity> sampleOptional = houseService.findById(0);
+        Optional<HouseInternalEntity> result = houseService.findById(0);
 
         //then
-        Assertions.assertEquals(sampleOptional, Optional.of(sampleHouseInternalEntity));
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(result.get(), sampleHouseInternalEntity);
+        Assertions.assertEquals(result, Optional.of(sampleHouseInternalEntity));
     }
 
     @Test
     @DisplayName("Should call a method deleteByHouseNumber from houseRepository when deleteHouseFromDatabase is called")
     void test6() {
         //given
-        HouseRequest sampleRequest = sampleHouseRequest;
+        HouseRequest sampleHouseRequest = new HouseRequest("House1");
 
         //when
-        houseService.deleteHouseFromDatabase(sampleRequest);
+        houseService.deleteHouseFromDatabase(sampleHouseRequest);
 
         //then
         Mockito.verify(houseRepositoryMock).deleteByHouseNumber(sampleHouseRequest.getHouseNumber());
@@ -129,6 +118,9 @@ class HouseServiceTest {
     @DisplayName("Should return a current capacity of HouseInternalEntity")
     void test7() {
         //given
+        HouseRequest sampleHouseRequest = new HouseRequest("House1");
+        HouseInternalEntity sampleHouseInternalEntity =
+                new HouseInternalEntity(now, "House1", 3, 0);
         Mockito.when(houseRepositoryMock
                 .findByHouseNumber(sampleHouseRequest.getHouseNumber())).thenReturn(sampleHouseInternalEntity);
 
@@ -143,6 +135,7 @@ class HouseServiceTest {
     @DisplayName("Should return true if HouseInternalEntity exists in db")
     void test8(){
         //given
+        HouseRequest sampleHouseRequest = new HouseRequest("House1");
         Mockito.when(houseRepositoryMock.existsByHouseNumber(sampleHouseRequest.getHouseNumber())).thenReturn(true);
 
         //when
@@ -155,6 +148,7 @@ class HouseServiceTest {
     @DisplayName("Should return false if HouseInternalEntity does not exist in db")
     void test9(){
         //given
+        HouseRequest sampleHouseRequest = new HouseRequest("House1");
         Mockito.when(houseRepositoryMock.existsByHouseNumber(sampleHouseRequest.getHouseNumber())).thenReturn(false);
 
         //when
@@ -167,6 +161,9 @@ class HouseServiceTest {
     @DisplayName("Should return true if HouseInternalEntity has spare capacity")
     void test10(){
         //given
+        HouseRequest sampleHouseRequest = new HouseRequest("House1");
+        HouseInternalEntity sampleHouseInternalEntity =
+                new HouseInternalEntity(now, "House1", 3, 0);
         Mockito.when(houseRepositoryMock
                 .findByHouseNumber(sampleHouseRequest.getHouseNumber())).thenReturn(sampleHouseInternalEntity);
 
@@ -181,6 +178,7 @@ class HouseServiceTest {
     @DisplayName("Should increase HouseInternalEntity capacity by one based on HouseRequest")
     void test11() {
         //given
+        HouseRequest sampleHouseRequest = new HouseRequest("House1");
         HouseInternalEntity foundHouseInternalEntity = new HouseInternalEntity(1, LocalDateTime.now(), LocalDateTime.now(),
                 "House1", 3, 0);
 
@@ -200,6 +198,7 @@ class HouseServiceTest {
     @DisplayName("Should decrease HouseInternalEntity capacity by one based on HouseRequest")
     void test12() {
         //given
+        HouseRequest sampleHouseRequest = new HouseRequest("House1");
         HouseInternalEntity foundHouseInternalEntity = new HouseInternalEntity(1, LocalDateTime.now(), LocalDateTime.now(),
                 "House1", 3, 0);
 
