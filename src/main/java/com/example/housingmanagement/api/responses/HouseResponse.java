@@ -3,6 +3,9 @@ package com.example.housingmanagement.api.responses;
 public class HouseResponse {
     private String houseNumber;
 
+    public HouseResponse() {
+    }
+
     public HouseResponse(String houseNumber) {
         this.houseNumber = houseNumber;
     }
