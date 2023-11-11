@@ -5,6 +5,7 @@ import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.responses.HouseResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,10 +34,20 @@ class HouseControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    public void getAllHousesShouldReturnListOfHouses() throws Exception {
-        houseRepository.save(new HouseInternalEntity(LocalDateTime.now(), "11111", 3, 0));
+    private final LocalDateTime now = LocalDateTime.now();
 
+
+    @Test
+    @DisplayName("getAllHouses should return a list of houses as List<HouseResponse>")
+    public void getAllHousesShouldReturnListOfHouses() throws Exception {
+        //given
+        HouseInternalEntity house1 = new HouseInternalEntity(now, "House1", 3, 0);
+        HouseInternalEntity house2 = new HouseInternalEntity(now, "House2", 2, 0);
+
+        houseRepository.save(house1);
+        houseRepository.save(house2);
+
+        //when
         // Wykonaj żądanie HTTP GET na endpoint /houses
         MvcResult result = mockMvc.perform(get("/houses")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -50,8 +61,12 @@ class HouseControllerTest {
         List<HouseResponse> houseResponses = objectMapper.readValue(responseContent, new TypeReference<>() {
         });
 
+        //then
         // Dodaj swoje asercje związane z oczekiwanym wynikiem
-        assertEquals(6, houseResponses.size());
+        assertEquals(2, houseResponses.size());
+        assertEquals("House1", houseResponses.get(0).getHouseNumber());
+        assertEquals("House2", houseResponses.get(1).getHouseNumber());
     }
+
 
 }
