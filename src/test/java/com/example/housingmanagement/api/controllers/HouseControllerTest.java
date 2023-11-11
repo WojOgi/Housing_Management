@@ -4,29 +4,25 @@ import com.example.housingmanagement.api.HouseRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.RequestBuilder;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -60,10 +56,7 @@ class HouseControllerTest {
 
         //when
         // Wykonaj żądanie HTTP GET na endpoint /houses
-        MvcResult result = mockMvc.perform(get("/houses")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+        MvcResult result = mockMvc.perform(get("/houses").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
 
         // Pobierz zawartość odpowiedzi
         String responseContent = result.getResponse().getContentAsString();
@@ -91,20 +84,20 @@ class HouseControllerTest {
 
         //when
         // Wykonaj żądanie HTTP GET na endpoint /houses
-        MvcResult result = mockMvc.perform(get("/houses/available").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult result = mockMvc.perform(get("/houses/available").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
         // Pobierz zawartość odpowiedzi
         String responseContent = result.getResponse().getContentAsString();
-        List<HouseResponse> houseResponses = objectMapper.readValue(responseContent, new TypeReference<>(){
+        List<HouseResponse> houseResponses = objectMapper.readValue(responseContent, new TypeReference<>() {
         });
         List<String> houseResponsesNames = houseResponses.stream().map(HouseResponse::getHouseNumber).toList();
 
         //then
         assertFalse(houseResponses.isEmpty());
         assertEquals(1, houseResponses.size());
-        assertEquals("House1",houseResponses.get(0).getHouseNumber());
+        assertEquals("House1", houseResponses.get(0).getHouseNumber());
         assertFalse(houseResponsesNames.contains("House2"));
     }
+
     @Test
     @DisplayName("Should return house with matching id")
     public void getHouseByPathVariableIdShouldReturnHouse() throws Exception {
@@ -122,13 +115,12 @@ class HouseControllerTest {
 
         //when
         // Wykonaj żądanie HTTP GET na endpoint /houses
-        MvcResult result = mockMvc
-                .perform(get("/houses/{id}", id).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult result = mockMvc.perform(get("/houses/{id}", id).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
 
         // Pobierz zawartość odpowiedzi
         String responseContent = result.getResponse().getContentAsString();
-        HouseResponse houseResponse = objectMapper.readValue(responseContent, new TypeReference<>(){});
+        HouseResponse houseResponse = objectMapper.readValue(responseContent, new TypeReference<>() {
+        });
 
         //then
         assertEquals("House1", houseResponse.getHouseNumber());
@@ -143,10 +135,7 @@ class HouseControllerTest {
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc
-                .perform(post("/houses").contentType(MediaType.APPLICATION_JSON)
-                        .content(houseRequestJSONString))
-                .andExpect(status().isCreated()).andReturn();
+        MvcResult result = mockMvc.perform(post("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isCreated()).andReturn();
 
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
@@ -164,10 +153,7 @@ class HouseControllerTest {
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc
-                .perform(post("/houses").contentType(MediaType.APPLICATION_JSON)
-                        .content(houseRequestJSONString))
-                .andExpect(status().isCreated()).andReturn();
+        MvcResult result = mockMvc.perform(post("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isCreated()).andReturn();
 
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
@@ -185,10 +171,7 @@ class HouseControllerTest {
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc
-                .perform(post("/houses").contentType(MediaType.APPLICATION_JSON)
-                        .content(houseRequestJSONString))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        MvcResult result = mockMvc.perform(post("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isUnprocessableEntity()).andReturn();
 
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());
@@ -196,7 +179,7 @@ class HouseControllerTest {
 
     @Test
     @DisplayName("Should delete a house if the house exists in the database and has no occupants")
-    public void deleteSpecificHouseWhenItExistsInDb() throws Exception{
+    public void deleteSpecificHouseWhenItExistsInDb() throws Exception {
         //given
         houseRepository.save(new HouseInternalEntity(now, "house0", 3, 0));
 
@@ -204,9 +187,7 @@ class HouseControllerTest {
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON)
-                .content(houseRequestJSONString))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isOk()).andReturn();
 
         //then
         assertEquals(200, result.getResponse().getStatus());
@@ -215,7 +196,7 @@ class HouseControllerTest {
 
     @Test
     @DisplayName("Should not delete a house if the house does not in the database and has no occupants")
-    public void shouldNotdeleteSpecificHouseWhenItDoesNotExistsInDb() throws Exception{
+    public void shouldNotdeleteSpecificHouseWhenItDoesNotExistsInDb() throws Exception {
         //given
         houseRepository.save(new HouseInternalEntity(now, "house0", 3, 0));
 
@@ -223,9 +204,7 @@ class HouseControllerTest {
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON)
-                        .content(houseRequestJSONString))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isUnprocessableEntity()).andReturn();
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -234,7 +213,7 @@ class HouseControllerTest {
 
     @Test
     @DisplayName("Should not delete a house if the house exists in the database but is occupied")
-    public void shouldNotdeleteSpecificHouseWhenItDoesExistsInDbButIsOccupied() throws Exception{
+    public void shouldNotdeleteSpecificHouseWhenItDoesExistsInDbButIsOccupied() throws Exception {
         //given
         houseRepository.save(new HouseInternalEntity(now, "house0", 3, 1));
 
@@ -242,18 +221,12 @@ class HouseControllerTest {
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON)
-                        .content(houseRequestJSONString))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isUnprocessableEntity()).andReturn();
 
         //then
         assertEquals(422, result.getResponse().getStatus());
         assertFalse(houseRepository.findAll().isEmpty());
     }
-
-
-
-
 
 
 }
