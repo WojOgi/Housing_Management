@@ -194,6 +194,65 @@ class HouseControllerTest {
         Assertions.assertEquals(422, result.getResponse().getStatus());
     }
 
+    @Test
+    @DisplayName("Should delete a house if the house exists in the database and has no occupants")
+    public void deleteSpecificHouseWhenItExistsInDb() throws Exception{
+        //given
+        houseRepository.save(new HouseInternalEntity(now, "house0", 3, 0));
+
+        HouseRequest houseRequest = new HouseRequest("house0");
+        String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
+
+        //when
+        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON)
+                .content(houseRequestJSONString))
+                .andExpect(status().isOk()).andReturn();
+
+        //then
+        assertEquals(200, result.getResponse().getStatus());
+        assertTrue(houseRepository.findAll().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should not delete a house if the house does not in the database and has no occupants")
+    public void shouldNotdeleteSpecificHouseWhenItDoesNotExistsInDb() throws Exception{
+        //given
+        houseRepository.save(new HouseInternalEntity(now, "house0", 3, 0));
+
+        HouseRequest houseRequest = new HouseRequest("house1");
+        String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
+
+        //when
+        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON)
+                        .content(houseRequestJSONString))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        //then
+        assertEquals(422, result.getResponse().getStatus());
+        assertFalse(houseRepository.findAll().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should not delete a house if the house exists in the database but is occupied")
+    public void shouldNotdeleteSpecificHouseWhenItDoesExistsInDbButIsOccupied() throws Exception{
+        //given
+        houseRepository.save(new HouseInternalEntity(now, "house0", 3, 1));
+
+        HouseRequest houseRequest = new HouseRequest("house0");
+        String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
+
+        //when
+        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON)
+                        .content(houseRequestJSONString))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        //then
+        assertEquals(422, result.getResponse().getStatus());
+        assertFalse(houseRepository.findAll().isEmpty());
+    }
+
+
+
 
 
 
