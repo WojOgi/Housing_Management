@@ -7,10 +7,7 @@ import com.example.housingmanagement.api.responses.HouseResponse;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -112,13 +109,16 @@ class HouseControllerTest {
     @DisplayName("Should return house with matching id")
     public void getHouseByPathVariableIdShouldReturnHouse() throws Exception {
         //given
+
         HouseInternalEntity house1 = new HouseInternalEntity(now, "House1", 3, 0);
         HouseInternalEntity house2 = new HouseInternalEntity(now, "House2", 2, 0);
 
         houseRepository.save(house1);
         houseRepository.save(house2);
 
-        int id = 1; //Hibernate starts indexing from 1! not 0.
+        int id = house1.getId();
+        //Hibernate starts indexing from 1! not 0.
+        // ALSO: when the database was populated and cleared he continues id assignment!
 
         //when
         // Wykonaj żądanie HTTP GET na endpoint /houses
