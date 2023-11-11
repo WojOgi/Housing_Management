@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -68,5 +69,33 @@ class HouseControllerTest {
         assertEquals("House2", houseResponses.get(1).getHouseNumber());
     }
 
+    @Test
+    @DisplayName("Should return only houses that have currentCapacity < maxCapacity")
+    public void getAvailableHousesShouldReturnListOfAvailableHouses() throws Exception {
+        //given
+        HouseInternalEntity house1 = new HouseInternalEntity(now, "House1", 3, 0);
+        HouseInternalEntity house2 = new HouseInternalEntity(now, "House2", 2, 2);
+
+        houseRepository.save(house1);
+        houseRepository.save(house2);
+
+        //when
+        // Wykonaj żądanie HTTP GET na endpoint /houses
+        MvcResult result = mockMvc.perform(get("/houses/available").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        // Pobierz zawartość odpowiedzi
+        String responseContent = result.getResponse().getContentAsString();
+        List<HouseResponse> houseResponses = objectMapper.readValue(responseContent, new TypeReference<>(){
+        });
+        List<String> houseResponsesNames = houseResponses.stream().map(HouseResponse::getHouseNumber).toList();
+
+        //then
+        assertFalse(houseResponses.isEmpty());
+        assertEquals(1, houseResponses.size());
+        assertEquals("House1",houseResponses.get(0).getHouseNumber());
+        assertFalse(houseResponsesNames.contains("House2"));
+
+
+    }
 
 }
