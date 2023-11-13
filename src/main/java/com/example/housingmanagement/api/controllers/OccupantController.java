@@ -6,6 +6,7 @@ import com.example.housingmanagement.api.mappers.OccupantMapperInterface;
 import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
 import com.example.housingmanagement.api.services.OccupantService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,7 +57,7 @@ public class OccupantController {
         }
         //add Occupant to Database
         occupantService.addOccupantToDatabase(occupantMapper.toOccupantInternalEntity(occupantToBeAddedWithoutHouse));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     private boolean genderSpecifiedCorrectly(OccupantRequest occupantRequest) {

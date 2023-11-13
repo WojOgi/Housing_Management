@@ -3,9 +3,11 @@ package com.example.housingmanagement.api.controllers;
 import com.example.housingmanagement.api.OccupantRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.Gender;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
+import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -45,7 +48,7 @@ class OccupantControllerTest {
 
     @Test
     @DisplayName("getAllOccupants should return a list of occupants as List<OccupantResponse>")
-    public void getAllOccupantsShouldReturnListOfOccupants() throws Exception{
+    public void getAllOccupantsShouldReturnListOfOccupants() throws Exception {
         //given
         OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE);
         OccupantInternalEntity occupant2 = new OccupantInternalEntity(now, "Sarah", "Brent", Gender.FEMALE);
@@ -71,7 +74,7 @@ class OccupantControllerTest {
 
     @Test
     @DisplayName("Should return occupant with matching id")
-    public void getOccupantByPathVariableIdShouldReturnOccupant() throws Exception{
+    public void getOccupantByPathVariableIdShouldReturnOccupant() throws Exception {
         //given
         OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE);
         OccupantInternalEntity occupant2 = new OccupantInternalEntity(now, "Sarah", "Brent", Gender.FEMALE);
@@ -91,6 +94,48 @@ class OccupantControllerTest {
         assertEquals("Smith", occupantResponse.getLastName());
         assertNotEquals("Sarah", occupantResponse.getFirstName());
         assertNotEquals("Brent", occupantResponse.getLastName());
+    }
+
+    @Test
+    @DisplayName("Should add occupant to empty database and gender is specified correctly")
+    public void addOccupantWithoutHouseIfOccupantDoesNotExistAndGenderOK() throws Exception {
+        //given
+        OccupantRequest occupantRequest = new OccupantRequest("Barry", "White", Gender.MALE);
+        String occupantRequestJSONString = objectMapper.writeValueAsString(occupantRequest);
+        //when
+        MvcResult result = mockMvc.perform(post("/occupants").contentType(MediaType.APPLICATION_JSON).content(occupantRequestJSONString))
+                .andExpect(status().isCreated()).andReturn();
+        //then
+        Assertions.assertEquals(201, result.getResponse().getStatus());
+        assertEquals(occupantRepository.findAll().get(0).getFirstName(),"Barry");
+    }
+
+    @Test
+    @DisplayName("Should not add occupant if such occupant exists and gender is specified correctly")
+    public void shouldNotAddOccupantWithoutHouseIfOccupantDoesNotExistAndGenderOK() throws Exception {
+        //given
+        occupantRepository.save(new OccupantInternalEntity(now, "Barry", "White", Gender.MALE));
+
+        OccupantRequest occupantRequest = new OccupantRequest("Barry", "White", Gender.MALE);
+        String occupantRequestJSONString = objectMapper.writeValueAsString(occupantRequest);
+        //when
+        MvcResult result = mockMvc.perform(post("/occupants").contentType(MediaType.APPLICATION_JSON).content(occupantRequestJSONString))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+        //then
+        Assertions.assertEquals(422, result.getResponse().getStatus());
+    }
+
+    @Test
+    @DisplayName("Should NOT add occupant to empty database when gender is NOT specified correctly")
+    public void shouldNotaddOccupantWithoutHouseIfGenderNotOK() throws Exception {
+        //given
+        OccupantRequest occupantRequest = new OccupantRequest("Barry", "White", Gender.UNICORN);
+        String occupantRequestJSONString = objectMapper.writeValueAsString(occupantRequest);
+        //when
+        MvcResult result = mockMvc.perform(post("/occupants").contentType(MediaType.APPLICATION_JSON).content(occupantRequestJSONString))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+        //then
+        Assertions.assertEquals(422, result.getResponse().getStatus());
     }
 
 
