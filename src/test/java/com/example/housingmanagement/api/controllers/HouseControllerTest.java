@@ -139,6 +139,7 @@ class HouseControllerTest {
 
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
+        assertEquals(houseRepository.findAll().get(0).getHouseNumber(), "house1");
     }
 
     @Test
@@ -157,6 +158,8 @@ class HouseControllerTest {
 
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
+        assertEquals(houseRepository.findAll().get(2).getHouseNumber(), "house2");
+
     }
 
     @Test
