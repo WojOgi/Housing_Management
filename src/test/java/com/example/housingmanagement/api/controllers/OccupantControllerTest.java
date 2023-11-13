@@ -97,7 +97,7 @@ class OccupantControllerTest {
     }
 
     @Test
-    @DisplayName("Should add occupant to empty database and gender is specified correctly")
+    @DisplayName("Should add occupant to empty database when gender is specified correctly")
     public void addOccupantWithoutHouseIfOccupantDoesNotExistAndGenderOK() throws Exception {
         //given
         OccupantRequest occupantRequest = new OccupantRequest("Barry", "White", Gender.MALE);
@@ -107,11 +107,12 @@ class OccupantControllerTest {
                 .andExpect(status().isCreated()).andReturn();
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
-        assertEquals(occupantRepository.findAll().get(0).getFirstName(),"Barry");
+        assertEquals(occupantRepository.findAll().get(0).getFirstName(), "Barry");
+        assertEquals(1, occupantRepository.findAll().size());
     }
 
     @Test
-    @DisplayName("Should not add occupant if such occupant exists and gender is specified correctly")
+    @DisplayName("Should NOT add occupant if such occupant exists and gender is specified correctly")
     public void shouldNotAddOccupantWithoutHouseIfOccupantDoesNotExistAndGenderOK() throws Exception {
         //given
         occupantRepository.save(new OccupantInternalEntity(now, "Barry", "White", Gender.MALE));
@@ -123,11 +124,12 @@ class OccupantControllerTest {
                 .andExpect(status().isUnprocessableEntity()).andReturn();
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());
+        assertEquals(1, occupantRepository.findAll().size());
     }
 
     @Test
     @DisplayName("Should NOT add occupant to empty database when gender is NOT specified correctly")
-    public void shouldNotaddOccupantWithoutHouseIfGenderNotOK() throws Exception {
+    public void shouldNotAddOccupantWithoutHouseIfGenderNotOK() throws Exception {
         //given
         OccupantRequest occupantRequest = new OccupantRequest("Barry", "White", Gender.UNICORN);
         String occupantRequestJSONString = objectMapper.writeValueAsString(occupantRequest);
@@ -136,6 +138,7 @@ class OccupantControllerTest {
                 .andExpect(status().isUnprocessableEntity()).andReturn();
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());
+        assertTrue(occupantRepository.findAll().isEmpty());
     }
 
 
