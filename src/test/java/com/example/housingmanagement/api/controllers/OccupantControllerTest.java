@@ -108,11 +108,13 @@ class OccupantControllerTest {
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
         assertEquals(occupantRepository.findAll().get(0).getFirstName(), "Barry");
+        assertEquals(occupantRepository.findAll().get(0).getLastName(), "White");
+        assertEquals(occupantRepository.findAll().get(0).getGender(), Gender.MALE);
         assertEquals(1, occupantRepository.findAll().size());
     }
 
     @Test
-    @DisplayName("Should NOT add occupant if such occupant exists and gender is specified correctly")
+    @DisplayName("Should NOT add occupant if such occupant exists (first AND last name match) and gender is specified correctly")
     public void shouldNotAddOccupantWithoutHouseIfOccupantDoesNotExistAndGenderOK() throws Exception {
         //given
         occupantRepository.save(new OccupantInternalEntity(now, "Barry", "White", Gender.MALE));
