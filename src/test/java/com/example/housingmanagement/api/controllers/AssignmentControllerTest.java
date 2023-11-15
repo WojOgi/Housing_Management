@@ -5,7 +5,9 @@ import com.example.housingmanagement.api.OccupantRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.Gender;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
+import com.example.housingmanagement.api.requests.AssignmentRequest;
 import com.example.housingmanagement.api.requests.HouseRequest;
+import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,9 +24,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -84,6 +86,64 @@ class AssignmentControllerTest {
         assertEquals(2, occupantResponses.size());
         assertTrue(listOfFirstNames.contains("John") && listOfFirstNames.contains("Bret"));
         assertTrue(listOfLastNames.contains("Smith") && listOfLastNames.contains("Miller"));
+    }
+
+    @Test
+    @DisplayName("Should assign an existing unassigned occupant to a house with spare capacity")
+    void shouldAssignSpecificHomelessOccupantToSpecificHouseWithSpareCapacity() throws Exception {
+        //given
+        HouseInternalEntity house1 = new HouseInternalEntity(now, "house1", 3, 2);
+        houseRepository.save(house1);
+
+        OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, null);
+        occupantRepository.save(occupant1);
+
+        HouseRequest houseRequest = new HouseRequest("house1");
+        OccupantRequest occupantRequest = new OccupantRequest("John", "Smith", Gender.MALE);
+        AssignmentRequest assignmentRequest = new AssignmentRequest(houseRequest, occupantRequest);
+
+        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+
+        //when
+        MvcResult result = mockMvc.perform(put("/occupants/assign").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
+                .andExpect(status().isOk()).andReturn();
+
+        OccupantInternalEntity updatedOccupant = occupantRepository.findByFirstNameAndLastName(occupant1.getFirstName(), occupant1.getLastName());
+        HouseInternalEntity updatedHouse = houseRepository.findByHouseNumber(house1.getHouseNumber());
+
+        //then
+        assertEquals(200, result.getResponse().getStatus());
+        assertNotNull(updatedOccupant.getHouseInternalEntity());
+        assertNotNull(updatedHouse);
+        assertEquals(3, updatedHouse.getCurrentCapacity());
+        assertEquals(updatedHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
+    }
+
+    @Test
+    @DisplayName("Should NOT assign a non-existing occupant to a house with spare capacity")
+    void shouldNotAssignNonExistingOccupantToSpecificHouseWithSpareCapacity() throws Exception {
+
+
+    }
+    @Test
+    @DisplayName("Should NOT assign an unassigned occupant to a house with NO spare capacity")
+    void shouldNotAssigneSpecificHomelessOccupantToSpecificHouseWithNoSpareCapacity() throws Exception {
+
+
+    }
+
+    @Test
+    @DisplayName("Should NOT assign an already assigned occupant to a house with spare capacity")
+    void shouldNotAssignSpecificAlreadyAssignedOccupantToSpecificHouseWithNoSpareCapacity() throws Exception {
+
+
+    }
+
+    @Test
+    @DisplayName("Should NOT assign an unassigned occupant to a house with spare capacity if genders don't match")
+    void shouldNotAssignHomelessOccupantToSpecificHouseWithSpareCapacityIfGendersDontMatch() throws Exception {
+
+
     }
 
 
