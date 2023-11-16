@@ -198,8 +198,8 @@ class HouseControllerTest {
     }
 
     @Test
-    @DisplayName("Should not delete a house if the house does not in the database and has no occupants")
-    public void shouldNotdeleteSpecificHouseWhenItDoesNotExistsInDb() throws Exception {
+    @DisplayName("Should not delete a house if the house does not exist in the database and has no occupants")
+    public void shouldNotDeleteSpecificHouseWhenItDoesNotExistsInDb() throws Exception {
         //given
         houseRepository.save(new HouseInternalEntity(now, "house0", 3, 0));
 
@@ -216,7 +216,7 @@ class HouseControllerTest {
 
     @Test
     @DisplayName("Should not delete a house if the house exists in the database but is occupied")
-    public void shouldNotdeleteSpecificHouseWhenItDoesExistsInDbButIsOccupied() throws Exception {
+    public void shouldNotDeleteSpecificHouseWhenItDoesExistsInDbButIsOccupied() throws Exception {
         //given
         houseRepository.save(new HouseInternalEntity(now, "house0", 3, 1));
 
