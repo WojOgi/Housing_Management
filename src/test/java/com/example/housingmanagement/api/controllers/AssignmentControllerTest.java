@@ -114,13 +114,12 @@ class AssignmentControllerTest {
         //then
         assertEquals(200, result.getResponse().getStatus());
         assertNotNull(updatedOccupant.getHouseInternalEntity());
-        assertNotNull(updatedHouse);
         assertEquals(3, updatedHouse.getCurrentCapacity());
         assertEquals(updatedHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
     }
 
     @Test
-    @DisplayName("Should NOT assign a unassigned existing occupant to a non-existing house")
+    @DisplayName("Should NOT assign an unassigned existing occupant to a non-existing house")
     void shouldNotAssignUnassignedOccupantToNonExistingHouse() throws Exception {
         //given
         OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, null);
@@ -163,9 +162,7 @@ class AssignmentControllerTest {
 
         //then
         assertEquals(422, result.getResponse().getStatus());
-        assertNotNull(updatedHouse);
         assertEquals(2, updatedHouse.getCurrentCapacity());
-
     }
 
     @Test
@@ -194,7 +191,6 @@ class AssignmentControllerTest {
         //then
         assertEquals(422, result.getResponse().getStatus());
         assertNull(updatedOccupant.getHouseInternalEntity());
-        assertNotNull(updatedHouse);
         assertEquals(3, updatedHouse.getCurrentCapacity());
     }
 
@@ -226,7 +222,6 @@ class AssignmentControllerTest {
         //then
         assertEquals(422, result.getResponse().getStatus());
         assertNotNull(updatedOccupant.getHouseInternalEntity());
-        assertNotNull(updatedHouse);
         assertEquals(1, updatedHouse.getCurrentCapacity());
         assertNotEquals(updatedHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
     }
@@ -259,7 +254,6 @@ class AssignmentControllerTest {
         //then
         assertEquals(422, result.getResponse().getStatus());
         assertFalse(occupantInternalEntityFirstNames.contains("Kate"));
-        assertNotNull(updatedHouse);
         assertEquals(1, updatedHouse.getCurrentCapacity());
     }
 
