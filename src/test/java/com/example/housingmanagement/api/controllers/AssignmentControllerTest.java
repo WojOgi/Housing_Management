@@ -120,6 +120,29 @@ class AssignmentControllerTest {
     }
 
     @Test
+    @DisplayName("Should NOT assign a unassigned existing occupant to a non-existing house")
+    void shouldNotAssignUnassignedOccupantToNonExistingHouse() throws Exception {
+        //given
+        OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, null);
+        occupantRepository.save(occupant1);
+
+        HouseRequest houseRequest = new HouseRequest("house1");
+        OccupantRequest occupantRequest = new OccupantRequest("John", "Smith", Gender.MALE);
+        AssignmentRequest assignmentRequest = new AssignmentRequest(houseRequest, occupantRequest);
+
+        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+
+        //when
+        MvcResult result = mockMvc.perform(put("/occupants/assign").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        //then
+        assertEquals(422, result.getResponse().getStatus());
+        assertFalse(houseRepository.existsByHouseNumber("house1"));
+        assertNull(occupant1.getHouseInternalEntity());
+    }
+
+    @Test
     @DisplayName("Should NOT assign a non-existing occupant to a house with spare capacity")
     void shouldNotAssignNonExistingOccupantToSpecificHouseWithSpareCapacity() throws Exception {
         //given
@@ -238,6 +261,12 @@ class AssignmentControllerTest {
         assertFalse(occupantInternalEntityFirstNames.contains("Kate"));
         assertNotNull(updatedHouse);
         assertEquals(1, updatedHouse.getCurrentCapacity());
+    }
+
+    @Test
+    @DisplayName("Should move an already assigned occupant to a different house if has spare capacity and genders match")
+    void shouldMoveSpecificOccupantToDifferentHouse() throws Exception {
+
     }
 
 
