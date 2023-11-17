@@ -282,13 +282,36 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedSourceHouse = houseRepository.findByHouseNumber(sourceHouse.getHouseNumber());
         HouseInternalEntity updatedTargetHouse = houseRepository.findByHouseNumber(targetHouse.getHouseNumber());
 
-
         //then
         assertEquals(200, result.getResponse().getStatus());
         assertEquals(0, updatedSourceHouse.getCurrentCapacity());
         assertEquals(2, updatedTargetHouse.getCurrentCapacity());
+    }
+
+    @Test
+    @DisplayName("Should NOT move an assigned occupant to a different house if house does not exist")
+    void shouldNotMoveSpecificOccupantToNonExistingHouse() throws Exception {
 
     }
+
+    @Test
+    @DisplayName("Should NOT move an assigned occupant to a different house if house does NOT have spare capacity but genders match")
+    void shouldNotMoveSpecificOccupantToExistingHouseWithoutSpareCapacity() throws Exception {
+
+    }
+
+    @Test
+    @DisplayName("Should NOT move an assigned occupant to a different house even though it has spare capacity but genders do NOT match")
+    void shouldNotMoveSpecificOccupantToExistingHouseIfGendersDontMatch() throws Exception {
+
+    }
+
+    @Test
+    @DisplayName("Should NOT move an unassigned occupant to a different house even though it has spare capacity and genders match")
+    void shouldNotMoveUnassignedSpecificOccupantToDifferentHouse() throws Exception {
+
+    }
+
 
 
 }
