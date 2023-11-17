@@ -291,25 +291,129 @@ class AssignmentControllerTest {
     @Test
     @DisplayName("Should NOT move an assigned occupant to a different house if house does not exist")
     void shouldNotMoveSpecificOccupantToNonExistingHouse() throws Exception {
+        //given
+        HouseInternalEntity sourceHouse = new HouseInternalEntity(now, "sourceHouse", 3, 1);
+        houseRepository.save(sourceHouse);
 
+        OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
+        occupantRepository.save(occupantToMove);
+
+        HouseRequest houseRequest = new HouseRequest("targetHouse");
+        OccupantRequest occupantRequest = new OccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE);
+        AssignmentRequest assignmentRequest = new AssignmentRequest(houseRequest, occupantRequest);
+
+        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+
+        //when
+        MvcResult result = mockMvc.perform(put("/occupants/move").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        HouseInternalEntity updatedSourceHouse = houseRepository.findByHouseNumber(sourceHouse.getHouseNumber());
+        OccupantInternalEntity updatedOccupant = occupantRepository.findByFirstNameAndLastName(occupantToMove.getFirstName(), occupantToMove.getLastName());
+
+        //then
+        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(sourceHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
+        assertEquals(1, updatedSourceHouse.getCurrentCapacity());
     }
 
     @Test
     @DisplayName("Should NOT move an assigned occupant to a different house if house does NOT have spare capacity but genders match")
     void shouldNotMoveSpecificOccupantToExistingHouseWithoutSpareCapacity() throws Exception {
+        //given
+        HouseInternalEntity sourceHouse = new HouseInternalEntity(now, "sourceHouse", 3, 1);
+        HouseInternalEntity targetHouse = new HouseInternalEntity(now, "targetHouse", 3, 3);
+        houseRepository.save(sourceHouse);
+        houseRepository.save(targetHouse);
 
+        OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
+        occupantRepository.save(occupantToMove);
+
+        HouseRequest houseRequest = new HouseRequest("targetHouse");
+        OccupantRequest occupantRequest = new OccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE);
+        AssignmentRequest assignmentRequest = new AssignmentRequest(houseRequest, occupantRequest);
+
+        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+
+        //when
+        MvcResult result = mockMvc.perform(put("/occupants/move").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        HouseInternalEntity updatedSourceHouse = houseRepository.findByHouseNumber(sourceHouse.getHouseNumber());
+        HouseInternalEntity updatedTargetHouse = houseRepository.findByHouseNumber(targetHouse.getHouseNumber());
+        OccupantInternalEntity updatedOccupant = occupantRepository.findByFirstNameAndLastName(occupantToMove.getFirstName(), occupantToMove.getLastName());
+
+        //then
+        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(sourceHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
+        assertEquals(1, updatedSourceHouse.getCurrentCapacity());
+        assertEquals(3, updatedTargetHouse.getCurrentCapacity());
     }
 
     @Test
     @DisplayName("Should NOT move an assigned occupant to a different house even though it has spare capacity but genders do NOT match")
     void shouldNotMoveSpecificOccupantToExistingHouseIfGendersDontMatch() throws Exception {
+        //given
+        HouseInternalEntity sourceHouse = new HouseInternalEntity(now, "sourceHouse", 3, 1);
+        HouseInternalEntity targetHouse = new HouseInternalEntity(now, "targetHouse", 3, 1);
+        houseRepository.save(sourceHouse);
+        houseRepository.save(targetHouse);
 
+        OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
+        OccupantInternalEntity occupantToStay = new OccupantInternalEntity(now, "Brian", "Greene", Gender.MALE, targetHouse);
+        occupantRepository.save(occupantToMove);
+        occupantRepository.save(occupantToStay);
+
+        HouseRequest houseRequest = new HouseRequest("targetHouse");
+        OccupantRequest occupantRequest = new OccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE);
+        AssignmentRequest assignmentRequest = new AssignmentRequest(houseRequest, occupantRequest);
+
+        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+
+        //when
+        MvcResult result = mockMvc.perform(put("/occupants/move").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        HouseInternalEntity updatedSourceHouse = houseRepository.findByHouseNumber(sourceHouse.getHouseNumber());
+        HouseInternalEntity updatedTargetHouse = houseRepository.findByHouseNumber(targetHouse.getHouseNumber());
+        OccupantInternalEntity updatedOccupantToMove = occupantRepository.findByFirstNameAndLastName(occupantToMove.getFirstName(), occupantToMove.getLastName());
+        OccupantInternalEntity updatedOccupantToStay = occupantRepository.findByFirstNameAndLastName(occupantToStay.getFirstName(), occupantToStay.getLastName());
+
+        //then
+        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(sourceHouse.getHouseNumber(), updatedOccupantToMove.getHouseInternalEntity().getHouseNumber());
+        assertEquals(targetHouse.getHouseNumber(), updatedOccupantToStay.getHouseInternalEntity().getHouseNumber());
+        assertEquals(1, updatedSourceHouse.getCurrentCapacity());
+        assertEquals(1, updatedTargetHouse.getCurrentCapacity());
     }
 
     @Test
     @DisplayName("Should NOT move an unassigned occupant to a different house even though it has spare capacity and genders match")
     void shouldNotMoveUnassignedSpecificOccupantToDifferentHouse() throws Exception {
+        //given
+        HouseInternalEntity house1 = new HouseInternalEntity(now, "house1", 3, 1);
+        HouseInternalEntity house2 = new HouseInternalEntity(now, "house2", 3, 1);
+        houseRepository.save(house1);
+        houseRepository.save(house2);
 
+        HouseRequest houseRequest = new HouseRequest("house1");
+        OccupantRequest occupantRequest = new OccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE);
+        AssignmentRequest assignmentRequest = new AssignmentRequest(houseRequest, occupantRequest);
+
+        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+
+        //when
+        MvcResult result = mockMvc.perform(put("/occupants/move").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        HouseInternalEntity updatedHouse1 = houseRepository.findByHouseNumber(house1.getHouseNumber());
+        HouseInternalEntity updatedHouse2 = houseRepository.findByHouseNumber(house2.getHouseNumber());
+
+        //then
+        assertEquals(422, result.getResponse().getStatus());
+        assertTrue(occupantRepository.findAll().isEmpty());
+        assertEquals(1, updatedHouse1.getCurrentCapacity());
+        assertEquals(1, updatedHouse2.getCurrentCapacity());
     }
 
 
