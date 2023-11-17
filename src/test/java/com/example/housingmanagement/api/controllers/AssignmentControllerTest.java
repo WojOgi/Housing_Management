@@ -260,6 +260,33 @@ class AssignmentControllerTest {
     @Test
     @DisplayName("Should move an already assigned occupant to a different house if has spare capacity and genders match")
     void shouldMoveSpecificOccupantToDifferentHouse() throws Exception {
+        //given
+        HouseInternalEntity sourceHouse = new HouseInternalEntity(now, "sourceHouse", 3, 1);
+        HouseInternalEntity targetHouse = new HouseInternalEntity(now, "targetHouse", 3, 1);
+        houseRepository.save(sourceHouse);
+        houseRepository.save(targetHouse);
+
+        OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
+        occupantRepository.save(occupantToMove);
+
+        HouseRequest houseRequest = new HouseRequest("targetHouse");
+        OccupantRequest occupantRequest = new OccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE);
+        AssignmentRequest assignmentRequest = new AssignmentRequest(houseRequest, occupantRequest);
+
+        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+
+        //when
+        MvcResult result = mockMvc.perform(put("/occupants/move").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
+                .andExpect(status().isOk()).andReturn();
+
+        HouseInternalEntity updatedSourceHouse = houseRepository.findByHouseNumber(sourceHouse.getHouseNumber());
+        HouseInternalEntity updatedTargetHouse = houseRepository.findByHouseNumber(targetHouse.getHouseNumber());
+
+
+        //then
+        assertEquals(200, result.getResponse().getStatus());
+        assertEquals(0, updatedSourceHouse.getCurrentCapacity());
+        assertEquals(2, updatedTargetHouse.getCurrentCapacity());
 
     }
 
