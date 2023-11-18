@@ -30,6 +30,13 @@ class HouseControllerTest {
         houseRepository.deleteAll();
     }
 
+
+    //ctrl + alt + m -> extract method
+    //zaznaczenie slowa --> alt + j -> zaznacza kolejne występowanie tego słowa
+    // alt + shift + j -> cofa zaznaczenie
+    // zaznacz logiczną całość (np skończoną implementacja co cos robi) -> ctrl + alt + m ->
+    // ctrl + alt + n => inline variable (przy house1 itp)
+
     @Test
     @DisplayName("getAllHouses should return a list of all houses")
     public void getAllHousesShouldReturnListOfHouses() throws Exception {
