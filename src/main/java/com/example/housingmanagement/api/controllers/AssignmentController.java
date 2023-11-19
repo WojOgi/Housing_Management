@@ -12,10 +12,12 @@ import com.example.housingmanagement.api.responses.OccupantResponse;
 import com.example.housingmanagement.api.services.AssignmentService;
 import com.example.housingmanagement.api.services.HouseService;
 import com.example.housingmanagement.api.services.OccupantService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class AssignmentController {
@@ -36,6 +38,9 @@ public class AssignmentController {
 
     @GetMapping(value = "/occupants_of_house")
     public ResponseEntity<List<OccupantResponse>> getAllOccupantsOfSpecificHouse(@RequestBody HouseRequest houseRequest) {
+        if (isInvalidHouseRequest(houseRequest)) {
+            return ResponseEntity.badRequest().build();
+        }
         //checks if this house exists
         if (!houseService.existsByHouse(houseRequest)) {
             return ResponseEntity.unprocessableEntity().build();
@@ -51,6 +56,9 @@ public class AssignmentController {
 
     @PutMapping(value = "/occupants/assign")
     public ResponseEntity<Void> assignSpecificHomelessOccupantToSpecificHouse(@RequestBody AssignmentRequest assignmentRequest) {
+        if (isInvalidAssignmentRequest(assignmentRequest)) {
+            return ResponseEntity.badRequest().build();
+        }
         //check if target house exists and target occupant exists
         if (houseOrOccupantDontExist(assignmentRequest)) {
             return ResponseEntity.unprocessableEntity().build();
@@ -78,6 +86,9 @@ public class AssignmentController {
 
     @PutMapping(value = "/occupants/move")
     public ResponseEntity<Void> moveSpecificOccupantToDifferentHouse(@RequestBody AssignmentRequest assignmentRequest) {
+        if (isInvalidAssignmentRequest(assignmentRequest)) {
+            return ResponseEntity.badRequest().build();
+        }
         //check if target house exists and target occupant exists
         //check if target occupant has a house that is different from current house and has spare capacity
         if (houseOrOccupantDontExist(assignmentRequest) || houseSpecifiedIncorrectly(assignmentRequest)) {
@@ -113,6 +124,9 @@ public class AssignmentController {
 
     @DeleteMapping(value = "/occupants")
     public ResponseEntity<Void> deleteSpecificOccupant(@RequestBody OccupantRequest occupantToBeDeleted) {
+        if (isInvalidOccupantRequest(occupantToBeDeleted)) {
+            return ResponseEntity.badRequest().build();
+        }
         //check if such occupant exists at all.
         if (!occupantService.existsByOccupant(occupantToBeDeleted)) {
             return ResponseEntity.badRequest().build();
@@ -169,6 +183,25 @@ public class AssignmentController {
                 .equals(assignmentRequest.getHouseToAssign().toString())
                 || !houseHasSpareCapacity(assignmentRequest);
     }
+
+    private static boolean isInvalidAssignmentRequest(AssignmentRequest assignmentRequest) {
+        return Objects.isNull(assignmentRequest)
+                || StringUtils.isBlank(assignmentRequest.getOccupantToAssign().getFirstName())
+                || StringUtils.isBlank(assignmentRequest.getOccupantToAssign().getLastName())
+                || Objects.isNull(assignmentRequest.getOccupantToAssign().getGender())
+                || StringUtils.isBlank(assignmentRequest.getHouseToAssign().getHouseNumber());
+    }
+
+    private static boolean isInvalidHouseRequest(HouseRequest houseRequest) {
+        return Objects.isNull(houseRequest) || StringUtils.isBlank(houseRequest.getHouseNumber());
+    }
+
+    private static boolean isInvalidOccupantRequest(OccupantRequest occupantRequest) {
+        return Objects.isNull(occupantRequest)
+                || StringUtils.isBlank(occupantRequest.getFirstName())
+                || StringUtils.isBlank(occupantRequest.getLastName());
+    }
+
 }
 
 
