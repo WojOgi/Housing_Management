@@ -50,10 +50,8 @@ class OccupantControllerTest {
     @DisplayName("getAllOccupants should return a list of occupants as List<OccupantResponse>")
     public void getAllOccupantsShouldReturnListOfOccupants() throws Exception {
         //given
-        OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE);
-        OccupantInternalEntity occupant2 = new OccupantInternalEntity(now, "Sarah", "Brent", Gender.FEMALE);
-
-        occupantRepository.saveAll(List.of(occupant1, occupant2));
+        putIntoOccupantRepository(maleOccupant("John", "Smith"));
+        putIntoOccupantRepository(femaleOccupant("Sarah", "Brent"));
 
         //when
         MvcResult result = mockMvc.perform(get("/occupants").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
@@ -76,12 +74,10 @@ class OccupantControllerTest {
     @DisplayName("Should return occupant with matching id")
     public void getOccupantByPathVariableIdShouldReturnOccupant() throws Exception {
         //given
-        OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE);
-        OccupantInternalEntity occupant2 = new OccupantInternalEntity(now, "Sarah", "Brent", Gender.FEMALE);
+        putIntoOccupantRepository(maleOccupant("John", "Smith"));
+        putIntoOccupantRepository(femaleOccupant("Sarah", "Brent"));
 
-        occupantRepository.saveAll(List.of(occupant1, occupant2));
-
-        int id = occupant1.getId();
+        int id = occupantRepository.findByFirstNameAndLastName("John", "Smith").getId();
 
         //when
         MvcResult result = mockMvc.perform(get("/occupants/{id}", id).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
@@ -100,8 +96,7 @@ class OccupantControllerTest {
     @DisplayName("Should add occupant to empty database when gender is specified correctly")
     public void addOccupantWithoutHouseIfOccupantDoesNotExistAndGenderOK() throws Exception {
         //given
-        OccupantRequest occupantRequest = new OccupantRequest("Barry", "White", Gender.MALE);
-        String occupantRequestJSONString = objectMapper.writeValueAsString(occupantRequest);
+        String occupantRequestJSONString = objectMapper.writeValueAsString(createValidOccupantRequest("Barry", "White", Gender.MALE));;
         //when
         MvcResult result = mockMvc.perform(post("/occupants").contentType(MediaType.APPLICATION_JSON).content(occupantRequestJSONString))
                 .andExpect(status().isCreated()).andReturn();
@@ -117,10 +112,10 @@ class OccupantControllerTest {
     @DisplayName("Should NOT add occupant if such occupant exists (first AND last name match) and gender is specified correctly")
     public void shouldNotAddOccupantWithoutHouseIfOccupantDoesNotExistAndGenderOK() throws Exception {
         //given
-        occupantRepository.save(new OccupantInternalEntity(now, "Barry", "White", Gender.MALE));
+        putIntoOccupantRepository(maleOccupant("Barry", "White"));
 
-        OccupantRequest occupantRequest = new OccupantRequest("Barry", "White", Gender.MALE);
-        String occupantRequestJSONString = objectMapper.writeValueAsString(occupantRequest);
+        String occupantRequestJSONString = objectMapper
+                .writeValueAsString(createValidOccupantRequest("Barry", "White", Gender.MALE));
         //when
         MvcResult result = mockMvc.perform(post("/occupants").contentType(MediaType.APPLICATION_JSON).content(occupantRequestJSONString))
                 .andExpect(status().isUnprocessableEntity()).andReturn();
@@ -133,14 +128,29 @@ class OccupantControllerTest {
     @DisplayName("Should NOT add occupant to empty database when gender is NOT specified correctly")
     public void shouldNotAddOccupantWithoutHouseIfGenderNotOK() throws Exception {
         //given
-        OccupantRequest occupantRequest = new OccupantRequest("Barry", "White", Gender.UNICORN);
-        String occupantRequestJSONString = objectMapper.writeValueAsString(occupantRequest);
+        String occupantRequestJSONString = objectMapper
+                .writeValueAsString(createValidOccupantRequest("Barry", "White", Gender.UNICORN));
         //when
         MvcResult result = mockMvc.perform(post("/occupants").contentType(MediaType.APPLICATION_JSON).content(occupantRequestJSONString))
                 .andExpect(status().isUnprocessableEntity()).andReturn();
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());
         assertTrue(occupantRepository.findAll().isEmpty());
+    }
+
+    private OccupantInternalEntity maleOccupant(String firstName, String lastName) {
+        return new OccupantInternalEntity(now, firstName, lastName, Gender.MALE);
+    }
+
+    private OccupantInternalEntity femaleOccupant (String firstName, String lastName) {
+        return new OccupantInternalEntity(now, firstName, lastName, Gender.FEMALE);
+    }
+    private static OccupantRequest createValidOccupantRequest(String firstName, String lastName, Gender gender) {
+        return new OccupantRequest(firstName, lastName, gender);
+    }
+
+    private void putIntoOccupantRepository(OccupantInternalEntity occupantInternalEntity){
+        occupantRepository.save(occupantInternalEntity);
     }
 
 
