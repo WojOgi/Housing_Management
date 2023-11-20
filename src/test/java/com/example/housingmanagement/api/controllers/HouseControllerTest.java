@@ -48,11 +48,8 @@ class HouseControllerTest {
     @DisplayName("getAllHouses should return a list of houses as List<HouseResponse>")
     public void getAllHousesShouldReturnListOfHouses() throws Exception {
         //given
-        HouseInternalEntity house1 = new HouseInternalEntity(now, "House1", 3, 0);
-        HouseInternalEntity house2 = new HouseInternalEntity(now, "House2", 2, 0);
-
-        houseRepository.save(house1);
-        houseRepository.save(house2);
+        putIntoHouseDatabase(anEmptyHouse("house1", 3));
+        putIntoHouseDatabase(aFullHouse("house2", 2));
 
         //when
         // Wykonaj żądanie HTTP GET na endpoint /houses
@@ -68,19 +65,16 @@ class HouseControllerTest {
         //then
         // Dodaj swoje asercje związane z oczekiwanym wynikiem
         assertEquals(2, houseResponses.size());
-        assertEquals("House1", houseResponses.get(0).getHouseNumber());
-        assertEquals("House2", houseResponses.get(1).getHouseNumber());
+        assertEquals("house1", houseResponses.get(0).getHouseNumber());
+        assertEquals("house2", houseResponses.get(1).getHouseNumber());
     }
 
     @Test
-    @DisplayName("Should return only houses that have currentCapacity < maxCapacity")
+    @DisplayName("Should return only partially occupied houses")
     public void getAvailableHousesShouldReturnListOfAvailableHouses() throws Exception {
         //given
-        HouseInternalEntity house1 = new HouseInternalEntity(now, "House1", 3, 0);
-        HouseInternalEntity house2 = new HouseInternalEntity(now, "House2", 2, 2);
-
-        houseRepository.save(house1);
-        houseRepository.save(house2);
+        putIntoHouseDatabase(aPartiallyOccupiedHouse("house1", 3, 1));
+        putIntoHouseDatabase(aFullHouse("house2", 2));
 
         //when
         // Wykonaj żądanie HTTP GET na endpoint /houses
@@ -94,22 +88,18 @@ class HouseControllerTest {
         //then
         assertFalse(houseResponses.isEmpty());
         assertEquals(1, houseResponses.size());
-        assertEquals("House1", houseResponses.get(0).getHouseNumber());
-        assertFalse(houseResponsesNames.contains("House2"));
+        assertEquals("house1", houseResponses.get(0).getHouseNumber());
+        assertFalse(houseResponsesNames.contains("house2"));
     }
 
     @Test
     @DisplayName("Should return house with matching id")
     public void getHouseByPathVariableIdShouldReturnHouse() throws Exception {
         //given
+        putIntoHouseDatabase(anEmptyHouse("house1", 3));
+        putIntoHouseDatabase(aFullHouse("house2", 2));
 
-        HouseInternalEntity house1 = new HouseInternalEntity(now, "House1", 3, 0);
-        HouseInternalEntity house2 = new HouseInternalEntity(now, "House2", 2, 0);
-
-        houseRepository.save(house1);
-        houseRepository.save(house2);
-
-        int id = house1.getId();
+        int id = houseRepository.findByHouseNumber("house1").getId();
         //Hibernate starts indexing from 1! not 0.
         // ALSO: when the database was populated and cleared he continues id assignment!
 
@@ -123,15 +113,15 @@ class HouseControllerTest {
         });
 
         //then
-        assertEquals("House1", houseResponse.getHouseNumber());
-        assertNotEquals("House2", houseResponse.getHouseNumber());
+        assertEquals("house1", houseResponse.getHouseNumber());
+        assertNotEquals("house2", houseResponse.getHouseNumber());
     }
 
     @Test
-    @DisplayName("Should add house to empty database based on provided HouseRequest")
+    @DisplayName("Should add house to empty database based on provided valid HouseRequest")
     public void addNewHouseShouldAddHouseToEmptyDatabase() throws Exception {
         //given
-        HouseRequest houseRequest = new HouseRequest("house1", 3);
+        HouseRequest houseRequest = createValidHouseRequest("house1", 3);
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
@@ -147,10 +137,10 @@ class HouseControllerTest {
     public void addNewHouseShouldAddHouseToDatabase() throws Exception {
         //given
         //populate database
-        houseRepository.save(new HouseInternalEntity(now, "house0", 3, 0));
-        houseRepository.save(new HouseInternalEntity(now, "house1", 3, 0));
+        putIntoHouseDatabase(anEmptyHouse("house0", 2));
+        putIntoHouseDatabase(anEmptyHouse("house1", 3));
 
-        HouseRequest houseRequest = new HouseRequest("house2", 3);
+        HouseRequest houseRequest = createValidHouseRequest("house2", 2);
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
@@ -167,10 +157,10 @@ class HouseControllerTest {
     public void addNewHouseShouldNotAddHouseToDatabase() throws Exception {
         //given
         //populate database
-        houseRepository.save(new HouseInternalEntity(now, "house0", 3, 0));
-        houseRepository.save(new HouseInternalEntity(now, "house1", 3, 0));
+        putIntoHouseDatabase(anEmptyHouse("house0", 3));
+        putIntoHouseDatabase(anEmptyHouse("house1", 3));
 
-        HouseRequest houseRequest = new HouseRequest("house1", 3);
+        HouseRequest houseRequest = createValidHouseRequest("house1", 2);
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
@@ -184,9 +174,9 @@ class HouseControllerTest {
     @DisplayName("Should delete a house if the house exists in the database and has no occupants")
     public void deleteSpecificHouseWhenItExistsInDb() throws Exception {
         //given
-        houseRepository.save(new HouseInternalEntity(now, "house0", 3, 0));
+        putIntoHouseDatabase(anEmptyHouse("house0", 3));
 
-        HouseRequest houseRequest = new HouseRequest("house0");
+        HouseRequest houseRequest = createValidHouseRequest("house0", 3);
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
@@ -201,9 +191,9 @@ class HouseControllerTest {
     @DisplayName("Should NOT delete a house if the house does not exist in the database and has no occupants")
     public void shouldNotDeleteSpecificHouseWhenItDoesNotExistsInDb() throws Exception {
         //given
-        houseRepository.save(new HouseInternalEntity(now, "house0", 3, 0));
+        putIntoHouseDatabase(anEmptyHouse("house0", 3));
 
-        HouseRequest houseRequest = new HouseRequest("house1");
+        HouseRequest houseRequest = createValidHouseRequest("house1", 2);
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
@@ -218,9 +208,9 @@ class HouseControllerTest {
     @DisplayName("Should NOT delete a house if the house exists in the database but is occupied")
     public void shouldNotDeleteSpecificHouseWhenItDoesExistsInDbButIsOccupied() throws Exception {
         //given
-        houseRepository.save(new HouseInternalEntity(now, "house0", 3, 1));
+        putIntoHouseDatabase(aPartiallyOccupiedHouse("house0", 3, 2));
 
-        HouseRequest houseRequest = new HouseRequest("house0");
+        HouseRequest houseRequest = createValidHouseRequest("house0", 3);
         String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
@@ -231,5 +221,23 @@ class HouseControllerTest {
         assertFalse(houseRepository.findAll().isEmpty());
     }
 
+    private HouseInternalEntity anEmptyHouse(String houseNumber, int maxCapacity) {
+        return new HouseInternalEntity(now, houseNumber, maxCapacity, 0);
+    }
 
+    private HouseInternalEntity aFullHouse(String houseNumber, int maxCapacity) {
+        return new HouseInternalEntity(now, houseNumber, maxCapacity, maxCapacity);
+    }
+
+    private HouseInternalEntity aPartiallyOccupiedHouse(String houseNumber, int maxCapacity, int currentCapacity) {
+        return new HouseInternalEntity(now, houseNumber, maxCapacity, currentCapacity);
+    }
+
+    private static HouseRequest createValidHouseRequest(String houseNumber, int maxCapacity) {
+        return new HouseRequest(houseNumber, maxCapacity);
+    }
+
+    private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
+        houseRepository.save(houseInternalEntity);
+    }
 }
