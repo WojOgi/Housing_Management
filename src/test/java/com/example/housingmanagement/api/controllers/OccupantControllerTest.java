@@ -50,8 +50,8 @@ class OccupantControllerTest {
     @DisplayName("getAllOccupants should return a list of occupants as List<OccupantResponse>")
     public void getAllOccupantsShouldReturnListOfOccupants() throws Exception {
         //given
-        putIntoOccupantRepository(maleOccupant("John", "Smith"));
-        putIntoOccupantRepository(femaleOccupant("Sarah", "Brent"));
+        putIntoOccupantDatabase(maleOccupant("John", "Smith"));
+        putIntoOccupantDatabase(femaleOccupant("Sarah", "Brent"));
 
         //when
         MvcResult result = mockMvc.perform(get("/occupants").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
@@ -74,8 +74,8 @@ class OccupantControllerTest {
     @DisplayName("Should return occupant with matching id")
     public void getOccupantByPathVariableIdShouldReturnOccupant() throws Exception {
         //given
-        putIntoOccupantRepository(maleOccupant("John", "Smith"));
-        putIntoOccupantRepository(femaleOccupant("Sarah", "Brent"));
+        putIntoOccupantDatabase(maleOccupant("John", "Smith"));
+        putIntoOccupantDatabase(femaleOccupant("Sarah", "Brent"));
 
         int id = occupantRepository.findByFirstNameAndLastName("John", "Smith").getId();
 
@@ -112,7 +112,7 @@ class OccupantControllerTest {
     @DisplayName("Should NOT add occupant if such occupant exists (first AND last name match) and gender is specified correctly")
     public void shouldNotAddOccupantWithoutHouseIfOccupantDoesNotExistAndGenderOK() throws Exception {
         //given
-        putIntoOccupantRepository(maleOccupant("Barry", "White"));
+        putIntoOccupantDatabase(maleOccupant("Barry", "White"));
 
         String occupantRequestJSONString = objectMapper
                 .writeValueAsString(createValidOccupantRequest("Barry", "White", Gender.MALE));
@@ -149,7 +149,7 @@ class OccupantControllerTest {
         return new OccupantRequest(firstName, lastName, gender);
     }
 
-    private void putIntoOccupantRepository(OccupantInternalEntity occupantInternalEntity){
+    private void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity){
         occupantRepository.save(occupantInternalEntity);
     }
 

@@ -234,7 +234,7 @@ class HouseControllerTest {
     }
 
     private static HouseRequest createValidHouseRequest(String houseNumber, int maxCapacity) {
-        return new HouseRequest(houseNumber, 3);
+        return new HouseRequest(houseNumber, maxCapacity);
     }
 
     private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
