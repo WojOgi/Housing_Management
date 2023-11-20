@@ -54,8 +54,7 @@ class HouseControllerTest {
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
         //when
-        String responseContent = performGet("/houses");
-        List<HouseResponse> houseResponses = getHouseResponseList(responseContent);
+        List<HouseResponse> houseResponses = getHouseResponseList(performGet("/houses"));
 
         //then
         assertEquals(2, houseResponses.size());
@@ -71,8 +70,7 @@ class HouseControllerTest {
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
         //when
-        String responseContent = performGet("/houses/available");
-        List<HouseResponse> houseResponses = getHouseResponseList(responseContent);
+        List<HouseResponse> houseResponses = getHouseResponseList(performGet("/houses/available"));
         List<String> houseResponsesNames = houseResponses.stream().map(HouseResponse::getHouseNumber).toList();
 
         //then
@@ -92,8 +90,7 @@ class HouseControllerTest {
         int id = houseRepository.findByHouseNumber("house1").getId();
 
         //when
-        String responseContent = performGetWithId("/houses/{id}", id);
-        HouseResponse houseResponse = getHouseResponse(responseContent);
+        HouseResponse houseResponse = getHouseResponse(performGetWithId("/houses/{id}", id));
 
         //then
         assertEquals("house1", houseResponse.getHouseNumber());
@@ -107,7 +104,7 @@ class HouseControllerTest {
         HouseRequest houseRequest = createValidHouseRequest("house1", 3);
 
         //when
-        MvcResult result = getMvcResultOfPOST(houseRequest, "/houses", status().isCreated());
+        var result = getMvcResultOfPOST(houseRequest, "/houses", status().isCreated());
 
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
@@ -125,7 +122,7 @@ class HouseControllerTest {
         HouseRequest houseRequest = createValidHouseRequest("house2", 2);
 
         //when
-        MvcResult result = getMvcResultOfPOST(houseRequest, "/houses", status().isCreated());
+        var result = getMvcResultOfPOST(houseRequest, "/houses", status().isCreated());
 
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
@@ -144,7 +141,7 @@ class HouseControllerTest {
         HouseRequest houseRequest = createValidHouseRequest("house1", 2);
 
         //when
-        MvcResult result = getMvcResultOfPOST(houseRequest, "/houses", status().isUnprocessableEntity());
+        var result = getMvcResultOfPOST(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());
@@ -159,7 +156,7 @@ class HouseControllerTest {
         HouseRequest houseRequest = createValidHouseRequest("house0", 3);
 
         //when
-        MvcResult result = getMvcResultOfDELETE(houseRequest, "/houses", status().isOk());
+        var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isOk());
 
         //then
         assertEquals(200, result.getResponse().getStatus());
@@ -175,7 +172,7 @@ class HouseControllerTest {
         HouseRequest houseRequest = createValidHouseRequest("house1", 2);
 
         //when
-        MvcResult result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
+        var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -191,7 +188,7 @@ class HouseControllerTest {
         HouseRequest houseRequest = createValidHouseRequest("house0", 3);
 
         //when
-        MvcResult result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
+        var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
         assertEquals(422, result.getResponse().getStatus());

@@ -56,8 +56,7 @@ class OccupantControllerTest {
         putIntoOccupantDatabase(femaleOccupant("Sarah", "Brent"));
 
         //when
-        String responseContent = performGet("/occupants");
-        List<OccupantResponse> occupantResponses = getOccupantResponseList(responseContent);
+        List<OccupantResponse> occupantResponses = getOccupantResponseList(performGet("/occupants"));
 
         List<String> firstNames = getFirstNames(occupantResponses);
         List<String> lastNames = getLastNames(occupantResponses);
@@ -81,8 +80,7 @@ class OccupantControllerTest {
         int id = occupantRepository.findByFirstNameAndLastName("John", "Smith").getId();
 
         //when
-        String responseContent = performGetWithId("/occupants/{id}", id);
-        OccupantResponse occupantResponse = getOccupantResponse(responseContent);
+        OccupantResponse occupantResponse = getOccupantResponse(performGetWithId("/occupants/{id}", id));
 
         //then
         assertEquals("John", occupantResponse.getFirstName());
@@ -98,7 +96,7 @@ class OccupantControllerTest {
         OccupantRequest occupantRequest = createValidOccupantRequest("Barry", "White", Gender.MALE);
 
         //when
-        MvcResult result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isCreated());
+        var result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isCreated());
 
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
@@ -117,7 +115,7 @@ class OccupantControllerTest {
         OccupantRequest occupantRequest = createValidOccupantRequest("Barry", "White", Gender.MALE);
 
         //when
-        MvcResult result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isUnprocessableEntity());
+        var result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isUnprocessableEntity());
 
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());
@@ -131,7 +129,7 @@ class OccupantControllerTest {
         OccupantRequest occupantRequest = createValidOccupantRequest("Barry", "White", Gender.UNICORN);
 
         //when
-        MvcResult result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isUnprocessableEntity());
+        var result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isUnprocessableEntity());
 
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());

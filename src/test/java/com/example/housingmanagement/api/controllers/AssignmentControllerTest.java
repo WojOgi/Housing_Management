@@ -68,10 +68,8 @@ class AssignmentControllerTest {
         occupantRepository.save(occupant1);
         occupantRepository.save(occupant2);
 
-        HouseRequest houseRequest = createValidHouseRequest("house1");
-
         //when
-        String responseContent = performGet(houseRequest, "/occupants_of_house");
+        String responseContent = performGet(createValidHouseRequest("house1"), "/occupants_of_house");
 
         List<String> listOfFirstNames = getListOfFirstNames(responseContent);
         List<String> listOfLastNames = getListOfLastNames(responseContent);
@@ -97,7 +95,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("John", "Smith", Gender.MALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isOk());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isOk());
 
         OccupantInternalEntity updatedOccupant = getUpdatedOccupant("John", "Smith");
         HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
@@ -121,7 +119,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("John", "Smith", Gender.MALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -141,7 +139,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("John", "Smith", Gender.MALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
         HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
 
@@ -164,7 +162,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("John", "Smith", Gender.MALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
         OccupantInternalEntity updatedOccupant = getUpdatedOccupant("John", "Smith");
         HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
@@ -193,7 +191,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("John", "Smith", Gender.MALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
         OccupantInternalEntity updatedOccupant = getUpdatedOccupant(occupant1.getFirstName(), occupant1.getLastName());
         HouseInternalEntity updatedHouse = getUpdatedHouse(house1.getHouseNumber());
@@ -221,7 +219,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("Kate", "Miller", Gender.FEMALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
         HouseInternalEntity updatedHouse = getUpdatedHouse(house1.getHouseNumber());
         List<String> occupantInternalEntityFirstNames = getFirstNames();
@@ -251,7 +249,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isOk());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isOk());
 
         HouseInternalEntity updatedSourceHouse = getUpdatedHouse(sourceHouse.getHouseNumber());
         HouseInternalEntity updatedTargetHouse = getUpdatedHouse(targetHouse.getHouseNumber());
@@ -278,7 +276,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
 
         HouseInternalEntity updatedSourceHouse = getUpdatedHouse(sourceHouse.getHouseNumber());
         OccupantInternalEntity updatedOccupant = getUpdatedOccupant(occupantToMove.getFirstName(), occupantToMove.getLastName());
@@ -307,7 +305,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
 
         HouseInternalEntity updatedSourceHouse = getUpdatedHouse(sourceHouse.getHouseNumber());
         HouseInternalEntity updatedTargetHouse = getUpdatedHouse(targetHouse.getHouseNumber());
@@ -340,7 +338,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
 
         HouseInternalEntity updatedSourceHouse = getUpdatedHouse(sourceHouse.getHouseNumber());
         HouseInternalEntity updatedTargetHouse = getUpdatedHouse(targetHouse.getHouseNumber());
@@ -370,7 +368,7 @@ class AssignmentControllerTest {
                         createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
 
         //when
-        MvcResult result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
 
         HouseInternalEntity updatedHouse1 = getUpdatedHouse(house1.getHouseNumber());
         HouseInternalEntity updatedHouse2 = getUpdatedHouse(house2.getHouseNumber());
