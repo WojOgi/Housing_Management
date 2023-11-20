@@ -118,6 +118,7 @@ class OccupantControllerTest {
 
         //when
         MvcResult result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isUnprocessableEntity());
+
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());
         assertEquals(1, occupantRepository.findAll().size());
@@ -131,6 +132,7 @@ class OccupantControllerTest {
 
         //when
         MvcResult result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isUnprocessableEntity());
+
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());
         assertTrue(occupantRepository.findAll().isEmpty());
