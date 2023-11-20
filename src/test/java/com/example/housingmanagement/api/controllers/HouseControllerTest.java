@@ -4,6 +4,7 @@ import com.example.housingmanagement.api.HouseRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,18 +54,10 @@ class HouseControllerTest {
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
         //when
-        // Wykonaj żądanie HTTP GET na endpoint /houses
-        MvcResult result = mockMvc.perform(get("/houses").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
-
-        // Pobierz zawartość odpowiedzi
-        String responseContent = result.getResponse().getContentAsString();
-
-        // Mapuj odpowiedź JSON na listę obiektów HouseResponse
-        List<HouseResponse> houseResponses = objectMapper.readValue(responseContent, new TypeReference<>() {
-        });
+        String responseContent = performGet("/houses");
+        List<HouseResponse> houseResponses = getHouseResponseList(responseContent);
 
         //then
-        // Dodaj swoje asercje związane z oczekiwanym wynikiem
         assertEquals(2, houseResponses.size());
         assertEquals("house1", houseResponses.get(0).getHouseNumber());
         assertEquals("house2", houseResponses.get(1).getHouseNumber());
@@ -77,12 +71,8 @@ class HouseControllerTest {
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
         //when
-        // Wykonaj żądanie HTTP GET na endpoint /houses
-        MvcResult result = mockMvc.perform(get("/houses/available").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
-        // Pobierz zawartość odpowiedzi
-        String responseContent = result.getResponse().getContentAsString();
-        List<HouseResponse> houseResponses = objectMapper.readValue(responseContent, new TypeReference<>() {
-        });
+        String responseContent = performGet("/houses/available");
+        List<HouseResponse> houseResponses = getHouseResponseList(responseContent);
         List<String> houseResponsesNames = houseResponses.stream().map(HouseResponse::getHouseNumber).toList();
 
         //then
@@ -100,17 +90,10 @@ class HouseControllerTest {
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
         int id = houseRepository.findByHouseNumber("house1").getId();
-        //Hibernate starts indexing from 1! not 0.
-        // ALSO: when the database was populated and cleared he continues id assignment!
 
         //when
-        // Wykonaj żądanie HTTP GET na endpoint /houses
-        MvcResult result = mockMvc.perform(get("/houses/{id}", id).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
-
-        // Pobierz zawartość odpowiedzi
-        String responseContent = result.getResponse().getContentAsString();
-        HouseResponse houseResponse = objectMapper.readValue(responseContent, new TypeReference<>() {
-        });
+        String responseContent = performGetWithId("/houses/{id}", id);
+        HouseResponse houseResponse = getHouseResponse(responseContent);
 
         //then
         assertEquals("house1", houseResponse.getHouseNumber());
@@ -122,10 +105,9 @@ class HouseControllerTest {
     public void addNewHouseShouldAddHouseToEmptyDatabase() throws Exception {
         //given
         HouseRequest houseRequest = createValidHouseRequest("house1", 3);
-        String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc.perform(post("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isCreated()).andReturn();
+        MvcResult result = getMvcResultOfPOST(houseRequest, "/houses", status().isCreated());
 
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
@@ -141,10 +123,9 @@ class HouseControllerTest {
         putIntoHouseDatabase(anEmptyHouse("house1", 3));
 
         HouseRequest houseRequest = createValidHouseRequest("house2", 2);
-        String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc.perform(post("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isCreated()).andReturn();
+        MvcResult result = getMvcResultOfPOST(houseRequest, "/houses", status().isCreated());
 
         //then
         Assertions.assertEquals(201, result.getResponse().getStatus());
@@ -161,10 +142,9 @@ class HouseControllerTest {
         putIntoHouseDatabase(anEmptyHouse("house1", 3));
 
         HouseRequest houseRequest = createValidHouseRequest("house1", 2);
-        String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc.perform(post("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isUnprocessableEntity()).andReturn();
+        MvcResult result = getMvcResultOfPOST(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());
@@ -177,10 +157,9 @@ class HouseControllerTest {
         putIntoHouseDatabase(anEmptyHouse("house0", 3));
 
         HouseRequest houseRequest = createValidHouseRequest("house0", 3);
-        String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isOk()).andReturn();
+        MvcResult result = getMvcResultOfDELETE(houseRequest, "/houses", status().isOk());
 
         //then
         assertEquals(200, result.getResponse().getStatus());
@@ -194,10 +173,9 @@ class HouseControllerTest {
         putIntoHouseDatabase(anEmptyHouse("house0", 3));
 
         HouseRequest houseRequest = createValidHouseRequest("house1", 2);
-        String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isUnprocessableEntity()).andReturn();
+        MvcResult result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -211,14 +189,40 @@ class HouseControllerTest {
         putIntoHouseDatabase(aPartiallyOccupiedHouse("house0", 3, 2));
 
         HouseRequest houseRequest = createValidHouseRequest("house0", 3);
-        String houseRequestJSONString = objectMapper.writeValueAsString(houseRequest);
 
         //when
-        MvcResult result = mockMvc.perform(delete("/houses").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSONString)).andExpect(status().isUnprocessableEntity()).andReturn();
+        MvcResult result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
         assertFalse(houseRepository.findAll().isEmpty());
+    }
+
+    private String performGet(String url) throws Exception {
+        return mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+    }
+
+    private String performGetWithId(String url, int id) throws Exception {
+        return mockMvc.perform(get(url, id).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+    }
+
+    private MvcResult getMvcResultOfPOST(HouseRequest houseRequest, String url, ResultMatcher expectedResult) throws Exception {
+        return mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(houseRequest))).andExpect(expectedResult).andReturn();
+    }
+
+    private MvcResult getMvcResultOfDELETE(HouseRequest houseRequest, String url, ResultMatcher expectedResult) throws Exception {
+        return mockMvc.perform(delete(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(houseRequest))).andExpect(expectedResult).andReturn();
+    }
+
+    private List<HouseResponse> getHouseResponseList(String responseContent) throws JsonProcessingException {
+        return objectMapper.readValue(responseContent, new TypeReference<>() {
+        });
+    }
+
+    private HouseResponse getHouseResponse(String responseContent) throws JsonProcessingException {
+        return objectMapper.readValue(responseContent, new TypeReference<>() {
+        });
     }
 
     private HouseInternalEntity anEmptyHouse(String houseNumber, int maxCapacity) {
