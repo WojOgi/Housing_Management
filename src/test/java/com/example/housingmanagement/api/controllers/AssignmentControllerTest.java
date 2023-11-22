@@ -9,6 +9,7 @@ import com.example.housingmanagement.api.requests.AssignmentRequest;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -66,21 +68,15 @@ class AssignmentControllerTest {
         occupantRepository.save(occupant1);
         occupantRepository.save(occupant2);
 
-        String houseRequestJSON = objectMapper.writeValueAsString(createValidHouseRequest("house1"));
-
         //when
-        MvcResult result = mockMvc.perform(get("/occupants_of_house").contentType(MediaType.APPLICATION_JSON).content(houseRequestJSON))
-                .andExpect(status().isOk()).andReturn();
+        String responseContent = performGet(createValidHouseRequest("house1"), "/occupants_of_house");
 
-        String responseContent = result.getResponse().getContentAsString();
-
-        List<OccupantResponse> occupantResponses = objectMapper.readValue(responseContent, new TypeReference<>() {
-        });
-        List<String> listOfFirstNames = occupantResponses.stream().map(OccupantResponse::getFirstName).toList();
-        List<String> listOfLastNames = occupantResponses.stream().map(OccupantResponse::getLastName).toList();
+        List<String> listOfFirstNames = getListOfFirstNames(responseContent);
+        List<String> listOfLastNames = getListOfLastNames(responseContent);
 
         //then
-        assertEquals(2, occupantResponses.size());
+        assertEquals(2, listOfFirstNames.size());
+        assertEquals(2, listOfLastNames.size());
         assertTrue(listOfFirstNames.contains("John") && listOfFirstNames.contains("Bret"));
         assertTrue(listOfLastNames.contains("Smith") && listOfLastNames.contains("Miller"));
     }
@@ -94,16 +90,15 @@ class AssignmentControllerTest {
         putIntoOccupantDatabase(maleOccupant("John", "Smith"));
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("house1"), createValidOccupantRequest("John", "Smith", Gender.MALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("house1"),
+                        createValidOccupantRequest("John", "Smith", Gender.MALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/assign").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isOk()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isOk());
 
-        OccupantInternalEntity updatedOccupant = occupantRepository.findByFirstNameAndLastName("John", "Smith");
-        HouseInternalEntity updatedHouse = houseRepository.findByHouseNumber("house1");
+        OccupantInternalEntity updatedOccupant = getUpdatedOccupant("John", "Smith");
+        HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
 
         //then
         assertEquals(200, result.getResponse().getStatus());
@@ -119,13 +114,12 @@ class AssignmentControllerTest {
         putIntoOccupantDatabase(maleOccupant("John", "Smith"));
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("house1"), createValidOccupantRequest("John", "Smith", Gender.MALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("house1"),
+                        createValidOccupantRequest("John", "Smith", Gender.MALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/assign").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -140,15 +134,14 @@ class AssignmentControllerTest {
         putIntoHouseDatabase(aPartiallyOccupiedHouse("house1", 3, 2));
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("house1"), createValidOccupantRequest("John", "Smith", Gender.MALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("house1"),
+                        createValidOccupantRequest("John", "Smith", Gender.MALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/assign").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
-        HouseInternalEntity updatedHouse = houseRepository.findByHouseNumber("house1");
+        HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -164,16 +157,15 @@ class AssignmentControllerTest {
         putIntoOccupantDatabase(maleOccupant("John", "Smith"));
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("house1"), createValidOccupantRequest("John", "Smith", Gender.MALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("house1"),
+                        createValidOccupantRequest("John", "Smith", Gender.MALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/assign").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
-        OccupantInternalEntity updatedOccupant = occupantRepository.findByFirstNameAndLastName("John", "Smith");
-        HouseInternalEntity updatedHouse = houseRepository.findByHouseNumber("house1");
+        OccupantInternalEntity updatedOccupant = getUpdatedOccupant("John", "Smith");
+        HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -194,16 +186,15 @@ class AssignmentControllerTest {
         occupantRepository.save(occupant1);
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("house1"), createValidOccupantRequest("John", "Smith", Gender.MALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("house1"),
+                        createValidOccupantRequest("John", "Smith", Gender.MALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/assign").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
-        OccupantInternalEntity updatedOccupant = occupantRepository.findByFirstNameAndLastName(occupant1.getFirstName(), occupant1.getLastName());
-        HouseInternalEntity updatedHouse = houseRepository.findByHouseNumber(house1.getHouseNumber());
+        OccupantInternalEntity updatedOccupant = getUpdatedOccupant(occupant1.getFirstName(), occupant1.getLastName());
+        HouseInternalEntity updatedHouse = getUpdatedHouse(house1.getHouseNumber());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -223,24 +214,22 @@ class AssignmentControllerTest {
         occupantRepository.save(occupant1);
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("house1"), createValidOccupantRequest("Kate", "Miller", Gender.FEMALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("house1"),
+                        createValidOccupantRequest("Kate", "Miller", Gender.FEMALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/assign").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
-        HouseInternalEntity updatedHouse = houseRepository.findByHouseNumber(house1.getHouseNumber());
-        List<OccupantInternalEntity> occupantInternalEntityList = occupantRepository.findAll();
-        List<String> occupantInternalEntityFirstNames = occupantInternalEntityList.stream().map(OccupantInternalEntity::getFirstName)
-                .toList();
+        HouseInternalEntity updatedHouse = getUpdatedHouse(house1.getHouseNumber());
+        List<String> occupantInternalEntityFirstNames = getFirstNames();
 
         //then
         assertEquals(422, result.getResponse().getStatus());
         assertFalse(occupantInternalEntityFirstNames.contains("Kate"));
         assertEquals(1, updatedHouse.getCurrentCapacity());
     }
+
 
     @Test
     @DisplayName("Should move an already assigned occupant to a different house if has spare capacity and genders match")
@@ -255,16 +244,15 @@ class AssignmentControllerTest {
         occupantRepository.save(occupantToMove);
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("targetHouse"), createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("targetHouse"),
+                        createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/move").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isOk()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isOk());
 
-        HouseInternalEntity updatedSourceHouse = houseRepository.findByHouseNumber(sourceHouse.getHouseNumber());
-        HouseInternalEntity updatedTargetHouse = houseRepository.findByHouseNumber(targetHouse.getHouseNumber());
+        HouseInternalEntity updatedSourceHouse = getUpdatedHouse(sourceHouse.getHouseNumber());
+        HouseInternalEntity updatedTargetHouse = getUpdatedHouse(targetHouse.getHouseNumber());
 
         //then
         assertEquals(200, result.getResponse().getStatus());
@@ -283,16 +271,15 @@ class AssignmentControllerTest {
         occupantRepository.save(occupantToMove);
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("targetHouse"), createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("targetHouse"),
+                        createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/move").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
 
-        HouseInternalEntity updatedSourceHouse = houseRepository.findByHouseNumber(sourceHouse.getHouseNumber());
-        OccupantInternalEntity updatedOccupant = occupantRepository.findByFirstNameAndLastName(occupantToMove.getFirstName(), occupantToMove.getLastName());
+        HouseInternalEntity updatedSourceHouse = getUpdatedHouse(sourceHouse.getHouseNumber());
+        OccupantInternalEntity updatedOccupant = getUpdatedOccupant(occupantToMove.getFirstName(), occupantToMove.getLastName());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -313,17 +300,16 @@ class AssignmentControllerTest {
         occupantRepository.save(occupantToMove);
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("targetHouse"), createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("targetHouse"),
+                        createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/move").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
 
-        HouseInternalEntity updatedSourceHouse = houseRepository.findByHouseNumber(sourceHouse.getHouseNumber());
-        HouseInternalEntity updatedTargetHouse = houseRepository.findByHouseNumber(targetHouse.getHouseNumber());
-        OccupantInternalEntity updatedOccupant = occupantRepository.findByFirstNameAndLastName(occupantToMove.getFirstName(), occupantToMove.getLastName());
+        HouseInternalEntity updatedSourceHouse = getUpdatedHouse(sourceHouse.getHouseNumber());
+        HouseInternalEntity updatedTargetHouse = getUpdatedHouse(targetHouse.getHouseNumber());
+        OccupantInternalEntity updatedOccupant = getUpdatedOccupant(occupantToMove.getFirstName(), occupantToMove.getLastName());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -347,18 +333,17 @@ class AssignmentControllerTest {
         occupantRepository.save(occupantToStay);
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("targetHouse"), createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("targetHouse"),
+                        createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/move").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
 
-        HouseInternalEntity updatedSourceHouse = houseRepository.findByHouseNumber(sourceHouse.getHouseNumber());
-        HouseInternalEntity updatedTargetHouse = houseRepository.findByHouseNumber(targetHouse.getHouseNumber());
-        OccupantInternalEntity updatedOccupantToMove = occupantRepository.findByFirstNameAndLastName(occupantToMove.getFirstName(), occupantToMove.getLastName());
-        OccupantInternalEntity updatedOccupantToStay = occupantRepository.findByFirstNameAndLastName(occupantToStay.getFirstName(), occupantToStay.getLastName());
+        HouseInternalEntity updatedSourceHouse = getUpdatedHouse(sourceHouse.getHouseNumber());
+        HouseInternalEntity updatedTargetHouse = getUpdatedHouse(targetHouse.getHouseNumber());
+        OccupantInternalEntity updatedOccupantToMove = getUpdatedOccupant(occupantToMove.getFirstName(), occupantToMove.getLastName());
+        OccupantInternalEntity updatedOccupantToStay = getUpdatedOccupant(occupantToStay.getFirstName(), occupantToStay.getLastName());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -378,22 +363,49 @@ class AssignmentControllerTest {
         houseRepository.save(house2);
 
         AssignmentRequest assignmentRequest =
-                new AssignmentRequest(createValidHouseRequest("targetHouse"), createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
-
-        String assignmentRequestJSON = objectMapper.writeValueAsString(assignmentRequest);
+                new AssignmentRequest(
+                        createValidHouseRequest("targetHouse"),
+                        createValidOccupantRequest("Oliwia", "Ogieglo", Gender.FEMALE));
 
         //when
-        MvcResult result = mockMvc.perform(put("/occupants/move").contentType(MediaType.APPLICATION_JSON).content(assignmentRequestJSON))
-                .andExpect(status().isUnprocessableEntity()).andReturn();
+        var result = getMvcResultOfPUT(assignmentRequest, "/occupants/move", status().isUnprocessableEntity());
 
-        HouseInternalEntity updatedHouse1 = houseRepository.findByHouseNumber(house1.getHouseNumber());
-        HouseInternalEntity updatedHouse2 = houseRepository.findByHouseNumber(house2.getHouseNumber());
+        HouseInternalEntity updatedHouse1 = getUpdatedHouse(house1.getHouseNumber());
+        HouseInternalEntity updatedHouse2 = getUpdatedHouse(house2.getHouseNumber());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
         assertTrue(occupantRepository.findAll().isEmpty());
         assertEquals(1, updatedHouse1.getCurrentCapacity());
         assertEquals(1, updatedHouse2.getCurrentCapacity());
+    }
+
+    private HouseInternalEntity getUpdatedHouse(String houseNumber) {
+        return houseRepository.findByHouseNumber(houseNumber);
+    }
+
+    private OccupantInternalEntity getUpdatedOccupant(String firstName, String lastName) {
+        return occupantRepository.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    private List<String> getListOfLastNames(String responseContent) throws JsonProcessingException {
+        return objectMapper.<List<OccupantResponse>>readValue(responseContent, new TypeReference<>() {
+        }).stream().map(OccupantResponse::getLastName).toList();
+    }
+
+    private List<String> getListOfFirstNames(String responseContent) throws JsonProcessingException {
+        return objectMapper.<List<OccupantResponse>>readValue(responseContent, new TypeReference<>() {
+        }).stream().map(OccupantResponse::getFirstName).toList();
+    }
+
+    private String performGet(HouseRequest houseRequest, String url) throws Exception {
+        return mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(houseRequest)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+    }
+
+    private MvcResult getMvcResultOfPUT(AssignmentRequest assignmentRequest, String url, ResultMatcher expectedResult) throws Exception {
+        return mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(assignmentRequest)))
+                .andExpect(expectedResult).andReturn();
     }
 
     private static HouseRequest createValidHouseRequest(String houseNumber) {
@@ -411,11 +423,18 @@ class AssignmentControllerTest {
     private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
         houseRepository.save(houseInternalEntity);
     }
-    private void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity){
+
+    private void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity) {
         occupantRepository.save(occupantInternalEntity);
     }
+
     private OccupantInternalEntity maleOccupant(String firstName, String lastName) {
         return new OccupantInternalEntity(now, firstName, lastName, Gender.MALE);
     }
+    private List<String> getFirstNames() {
+        return occupantRepository.findAll().stream().map(OccupantInternalEntity::getFirstName)
+                .toList();
+    }
+
 
 }
