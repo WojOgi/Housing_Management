@@ -5,8 +5,6 @@ import com.example.housingmanagement.api.dbentities.Gender;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +21,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.example.housingmanagement.api.utils.DataBaseTestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -40,8 +39,6 @@ class OccupantControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    private final LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void setUp() {
@@ -136,19 +133,9 @@ class OccupantControllerTest {
         assertTrue(occupantRepository.findAll().isEmpty());
     }
 
-    private OccupantResponse getOccupantResponse(String responseContent) throws JsonProcessingException {
-        return objectMapper.readValue(responseContent, new TypeReference<>() {
-        });
-    }
-
     private String performGetWithId(String url, int id) throws Exception {
         return mockMvc.perform(get(url, id)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-    }
-
-    private List<OccupantResponse> getOccupantResponseList(String responseContent) throws JsonProcessingException {
-        return objectMapper.readValue(responseContent, new TypeReference<>() {
-        });
     }
 
     private MvcResult getMvcResultOfPOST(OccupantRequest occupantRequest, String url, ResultMatcher expectedResult) throws Exception {
@@ -156,34 +143,12 @@ class OccupantControllerTest {
                 .andExpect(expectedResult).andReturn();
     }
 
-    private static List<String> getLastNames(List<OccupantResponse> occupantResponses) {
-        return occupantResponses.stream().map(OccupantResponse::getLastName).toList();
-    }
-
-    private static List<String> getFirstNames(List<OccupantResponse> occupantResponses) {
-        return occupantResponses.stream().map(OccupantResponse::getFirstName).toList();
-    }
-
     private String performGet(String url) throws Exception {
         return mockMvc.perform(get(url)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
     }
 
-    private OccupantInternalEntity maleOccupant(String firstName, String lastName) {
-        return new OccupantInternalEntity(now, firstName, lastName, Gender.MALE);
-    }
-
-    private OccupantInternalEntity femaleOccupant(String firstName, String lastName) {
-        return new OccupantInternalEntity(now, firstName, lastName, Gender.FEMALE);
-    }
-
-    private static OccupantRequest createValidOccupantRequest(String firstName, String lastName, Gender gender) {
-        return new OccupantRequest(firstName, lastName, gender);
-    }
-
     private void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity) {
         occupantRepository.save(occupantInternalEntity);
     }
-
-
 }

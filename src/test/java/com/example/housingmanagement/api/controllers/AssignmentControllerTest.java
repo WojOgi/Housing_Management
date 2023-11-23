@@ -7,10 +7,6 @@ import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.requests.AssignmentRequest;
 import com.example.housingmanagement.api.requests.HouseRequest;
-import com.example.housingmanagement.api.requests.OccupantRequest;
-import com.example.housingmanagement.api.responses.OccupantResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +22,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.example.housingmanagement.api.utils.DataBaseTestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -388,14 +385,17 @@ class AssignmentControllerTest {
         return occupantRepository.findByFirstNameAndLastName(firstName, lastName);
     }
 
-    private List<String> getListOfLastNames(String responseContent) throws JsonProcessingException {
-        return objectMapper.<List<OccupantResponse>>readValue(responseContent, new TypeReference<>() {
-        }).stream().map(OccupantResponse::getLastName).toList();
+    private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
+        houseRepository.save(houseInternalEntity);
     }
 
-    private List<String> getListOfFirstNames(String responseContent) throws JsonProcessingException {
-        return objectMapper.<List<OccupantResponse>>readValue(responseContent, new TypeReference<>() {
-        }).stream().map(OccupantResponse::getFirstName).toList();
+    private void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity) {
+        occupantRepository.save(occupantInternalEntity);
+    }
+
+    private List<String> getFirstNames() {
+        return occupantRepository.findAll().stream().map(OccupantInternalEntity::getFirstName)
+                .toList();
     }
 
     private String performGet(HouseRequest houseRequest, String url) throws Exception {
@@ -407,34 +407,4 @@ class AssignmentControllerTest {
         return mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(assignmentRequest)))
                 .andExpect(expectedResult).andReturn();
     }
-
-    private static HouseRequest createValidHouseRequest(String houseNumber) {
-        return new HouseRequest(houseNumber);
-    }
-
-    private static OccupantRequest createValidOccupantRequest(String firstName, String lastName, Gender gender) {
-        return new OccupantRequest(firstName, lastName, gender);
-    }
-
-    private HouseInternalEntity aPartiallyOccupiedHouse(String houseNumber, int maxCapacity, int currentCapacity) {
-        return new HouseInternalEntity(now, houseNumber, maxCapacity, currentCapacity);
-    }
-
-    private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
-        houseRepository.save(houseInternalEntity);
-    }
-
-    private void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity) {
-        occupantRepository.save(occupantInternalEntity);
-    }
-
-    private OccupantInternalEntity maleOccupant(String firstName, String lastName) {
-        return new OccupantInternalEntity(now, firstName, lastName, Gender.MALE);
-    }
-    private List<String> getFirstNames() {
-        return occupantRepository.findAll().stream().map(OccupantInternalEntity::getFirstName)
-                .toList();
-    }
-
-
 }

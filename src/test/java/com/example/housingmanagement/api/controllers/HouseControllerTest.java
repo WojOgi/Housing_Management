@@ -4,8 +4,7 @@ import com.example.housingmanagement.api.HouseRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.example.housingmanagement.api.utils.DataBaseTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,9 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.example.housingmanagement.api.utils.DataBaseTestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,7 +38,6 @@ class HouseControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void setUp() {
@@ -183,7 +181,7 @@ class HouseControllerTest {
     @DisplayName("Should NOT delete a house if the house exists in the database but is occupied")
     public void shouldNotDeleteSpecificHouseWhenItDoesExistsInDbButIsOccupied() throws Exception {
         //given
-        putIntoHouseDatabase(aPartiallyOccupiedHouse("house0", 3, 2));
+        putIntoHouseDatabase(DataBaseTestUtils.aPartiallyOccupiedHouse("house0", 3, 2));
 
         HouseRequest houseRequest = createValidHouseRequest("house0", 3);
 
@@ -212,33 +210,7 @@ class HouseControllerTest {
         return mockMvc.perform(delete(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(houseRequest))).andExpect(expectedResult).andReturn();
     }
 
-    private List<HouseResponse> getHouseResponseList(String responseContent) throws JsonProcessingException {
-        return objectMapper.readValue(responseContent, new TypeReference<>() {
-        });
-    }
-
-    private HouseResponse getHouseResponse(String responseContent) throws JsonProcessingException {
-        return objectMapper.readValue(responseContent, new TypeReference<>() {
-        });
-    }
-
-    private HouseInternalEntity anEmptyHouse(String houseNumber, int maxCapacity) {
-        return new HouseInternalEntity(now, houseNumber, maxCapacity, 0);
-    }
-
-    private HouseInternalEntity aFullHouse(String houseNumber, int maxCapacity) {
-        return new HouseInternalEntity(now, houseNumber, maxCapacity, maxCapacity);
-    }
-
-    private HouseInternalEntity aPartiallyOccupiedHouse(String houseNumber, int maxCapacity, int currentCapacity) {
-        return new HouseInternalEntity(now, houseNumber, maxCapacity, currentCapacity);
-    }
-
-    private static HouseRequest createValidHouseRequest(String houseNumber, int maxCapacity) {
-        return new HouseRequest(houseNumber, maxCapacity);
-    }
-
-    private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
+    public void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
         houseRepository.save(houseInternalEntity);
     }
 }
