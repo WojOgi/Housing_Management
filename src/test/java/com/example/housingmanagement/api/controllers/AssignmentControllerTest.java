@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.example.housingmanagement.api.utils.DataBaseTestUtils.*;
+import static com.example.housingmanagement.api.controllers.DataBaseTestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;

@@ -1,4 +1,4 @@
-package com.example.housingmanagement.api.utils;
+package com.example.housingmanagement.api.controllers;
 
 import com.example.housingmanagement.api.dbentities.Gender;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Component
 public class DataBaseTestUtils {
@@ -92,6 +93,4 @@ public class DataBaseTestUtils {
     public static HouseRequest createValidHouseRequest(String houseNumber) {
         return new HouseRequest(houseNumber);
     }
-
-
 }

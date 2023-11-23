@@ -4,7 +4,6 @@ import com.example.housingmanagement.api.HouseRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
-import com.example.housingmanagement.api.utils.DataBaseTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +19,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.List;
 
-import static com.example.housingmanagement.api.utils.DataBaseTestUtils.*;
+import static com.example.housingmanagement.api.controllers.DataBaseTestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -210,7 +209,8 @@ class HouseControllerTest {
         return mockMvc.perform(delete(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(houseRequest))).andExpect(expectedResult).andReturn();
     }
 
-    public void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
+    private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
         houseRepository.save(houseInternalEntity);
     }
+
 }
