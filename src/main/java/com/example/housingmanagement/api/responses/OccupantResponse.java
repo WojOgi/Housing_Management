@@ -9,6 +9,8 @@ public class OccupantResponse {
         this.lastName = lastName;
     }
 
+    public OccupantResponse(){}
+
     public String getFirstName() {
         return firstName;
     }
