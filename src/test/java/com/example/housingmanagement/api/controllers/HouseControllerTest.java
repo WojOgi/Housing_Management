@@ -4,7 +4,6 @@ import com.example.housingmanagement.api.HouseRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,16 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.List;
 
 import static com.example.housingmanagement.api.controllers.DataBaseTestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -29,14 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class HouseControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
     private HouseRepositoryJPA houseRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
 
     @BeforeEach
     void setUp() {
@@ -192,22 +179,6 @@ class HouseControllerTest {
         assertFalse(houseRepository.findAll().isEmpty());
     }
 
-    private String performGet(String url) throws Exception {
-        return mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-    }
-
-    private String performGetWithId(String url, int id) throws Exception {
-        return mockMvc.perform(get(url, id).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-    }
-
-    private MvcResult getMvcResultOfPOST(HouseRequest houseRequest, String url, ResultMatcher expectedResult) throws Exception {
-        return mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(houseRequest))).andExpect(expectedResult).andReturn();
-    }
-
-    private MvcResult getMvcResultOfDELETE(HouseRequest houseRequest, String url, ResultMatcher expectedResult) throws Exception {
-        return mockMvc.perform(delete(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(houseRequest))).andExpect(expectedResult).andReturn();
-    }
 
     private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
         houseRepository.save(houseInternalEntity);
