@@ -35,7 +35,7 @@ class HouseControllerTest {
     @DisplayName("getAllHouses should return a list of houses as List<HouseResponse>")
     public void getAllHousesShouldReturnListOfHouses() throws Exception {
         //given
-        putIntoHouseDatabase(anEmptyHouse("house1", 3));
+        putIntoHouseDatabase(anEmptyHouse("house1"));
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
         //when
@@ -69,7 +69,7 @@ class HouseControllerTest {
     @DisplayName("Should return house with matching id")
     public void getHouseByPathVariableIdShouldReturnHouse() throws Exception {
         //given
-        putIntoHouseDatabase(anEmptyHouse("house1", 3));
+        putIntoHouseDatabase(anEmptyHouse("house1"));
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
         int id = houseRepository.findByHouseNumber("house1").getId();
@@ -101,8 +101,8 @@ class HouseControllerTest {
     public void addNewHouseShouldAddHouseToDatabase() throws Exception {
         //given
         //populate database
-        putIntoHouseDatabase(anEmptyHouse("house0", 2));
-        putIntoHouseDatabase(anEmptyHouse("house1", 3));
+        putIntoHouseDatabase(anEmptyHouse("house0"));
+        putIntoHouseDatabase(anEmptyHouse("house1"));
 
         HouseRequest houseRequest = createValidHouseRequest("house2", 2);
 
@@ -120,8 +120,8 @@ class HouseControllerTest {
     public void addNewHouseShouldNotAddHouseToDatabase() throws Exception {
         //given
         //populate database
-        putIntoHouseDatabase(anEmptyHouse("house0", 3));
-        putIntoHouseDatabase(anEmptyHouse("house1", 3));
+        putIntoHouseDatabase(anEmptyHouse("house0"));
+        putIntoHouseDatabase(anEmptyHouse("house1"));
 
         HouseRequest houseRequest = createValidHouseRequest("house1", 2);
 
@@ -136,7 +136,7 @@ class HouseControllerTest {
     @DisplayName("Should delete a house if the house exists in the database and has no occupants")
     public void deleteSpecificHouseWhenItExistsInDb() throws Exception {
         //given
-        putIntoHouseDatabase(anEmptyHouse("house0", 3));
+        putIntoHouseDatabase(anEmptyHouse("house0"));
 
         HouseRequest houseRequest = createValidHouseRequest("house0", 3);
 
@@ -152,7 +152,7 @@ class HouseControllerTest {
     @DisplayName("Should NOT delete a house if the house does not exist in the database and has no occupants")
     public void shouldNotDeleteSpecificHouseWhenItDoesNotExistsInDb() throws Exception {
         //given
-        putIntoHouseDatabase(anEmptyHouse("house0", 3));
+        putIntoHouseDatabase(anEmptyHouse("house0"));
 
         HouseRequest houseRequest = createValidHouseRequest("house1", 2);
 

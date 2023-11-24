@@ -23,6 +23,10 @@ public class DataBaseTestUtils {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+
+
+
+
     public static List<HouseResponse> getHouseResponseList(String responseContent) throws JsonProcessingException {
         return objectMapper.readValue(responseContent, new TypeReference<>() {
         });
@@ -37,8 +41,8 @@ public class DataBaseTestUtils {
         return new HouseRequest(houseNumber, maxCapacity);
     }
 
-    public static HouseInternalEntity anEmptyHouse(String houseNumber, int maxCapacity) {
-        return new HouseInternalEntity(now, houseNumber, maxCapacity, 0);
+    public static HouseInternalEntity anEmptyHouse(String houseNumber) {
+        return new HouseInternalEntity(now, houseNumber, 3, 0);
     }
 
     public static HouseInternalEntity aFullHouse(String houseNumber, int maxCapacity) {
