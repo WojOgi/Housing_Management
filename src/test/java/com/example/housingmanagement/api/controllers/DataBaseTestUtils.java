@@ -10,6 +10,8 @@ import com.example.housingmanagement.api.responses.OccupantResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.bytebuddy.utility.RandomString;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -42,7 +44,13 @@ public class DataBaseTestUtils {
     }
 
     public static HouseInternalEntity anEmptyHouse(String houseNumber) {
-        return new HouseInternalEntity(now, houseNumber, 3, 0);
+        return new HouseInternalEntity(now, randomHouseName(), 3, 0);
+    }public static HouseInternalEntity anEmptyHouse() {
+        return new HouseInternalEntity(now, HouseHelper.randomHouseName(), 3, 0);
+    }
+
+    private static String randomHouseName() {
+    return RandomStringUtils.random(4);
     }
 
     public static HouseInternalEntity aFullHouse(String houseNumber, int maxCapacity) {

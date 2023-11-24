@@ -35,15 +35,36 @@ class HouseControllerTest {
     @DisplayName("getAllHouses should return a list of houses as List<HouseResponse>")
     public void getAllHousesShouldReturnListOfHouses() throws Exception {
         //given
-        putIntoHouseDatabase(anEmptyHouse("house1"));
-        putIntoHouseDatabase(aFullHouse("house2", 2));
+        HouseInternalEntity emptyHouse = anEmptyHouse();
+        HouseInternalEntity fullHouse = aFullHouse("house2", 2);
+        //and
+        putIntoHouseDatabase(List.of(emptyHouse, fullHouse));
 
         //when
         List<HouseResponse> houseResponses = getHouseResponseList(performGet("/houses"));
 
         //then
         assertEquals(2, houseResponses.size());
-        assertEquals("house1", houseResponses.get(0).getHouseNumber());
+        assertEquals(emptyHouse.getHouseNumber(), houseResponses.get(0).getHouseNumber());
+        assertEquals("house2", houseResponses.get(1).getHouseNumber());
+    }
+
+
+    @Test
+    @DisplayName("getAllHouses should return a list of houses as List<HouseResponse>")
+    public void getAllHousesShouldReturnListOfHouses() throws Exception {
+        //given
+        HouseInternalEntity emptyHouse = anEmptyHouse();
+        HouseInternalEntity fullHouse = aFullHouse("house2", 2);
+        //and
+        putIntoHouseDatabase(List.of(emptyHouse, fullHouse));
+
+        //when
+        List<HouseResponse> houseResponses = getHouseResponseList(performGet("/houses"));
+
+        //then
+        assertEquals(2, houseResponses.size());
+        assertEquals(emptyHouse.getHouseNumber(), houseResponses.get(0).getHouseNumber());
         assertEquals("house2", houseResponses.get(1).getHouseNumber());
     }
 
@@ -69,10 +90,14 @@ class HouseControllerTest {
     @DisplayName("Should return house with matching id")
     public void getHouseByPathVariableIdShouldReturnHouse() throws Exception {
         //given
+        HouseInternalEntity house1 = anEmptyHouse("house1");
+
+        //and
         putIntoHouseDatabase(anEmptyHouse("house1"));
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
-        int id = houseRepository.findByHouseNumber("house1").getId();
+        //and
+        int id = getHouseId(house1.getHouseNumber());
 
         //when
         HouseResponse houseResponse = getHouseResponse(performGetWithId("/houses/{id}", id));
@@ -141,7 +166,7 @@ class HouseControllerTest {
         HouseRequest houseRequest = createValidHouseRequest("house0", 3);
 
         //when
-        var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isOk());
+        var result = getMvcResultOfDelete(houseRequest, "/houses", status().isOk());
 
         //then
         assertEquals(200, result.getResponse().getStatus());
@@ -157,7 +182,7 @@ class HouseControllerTest {
         HouseRequest houseRequest = createValidHouseRequest("house1", 2);
 
         //when
-        var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
+        var result = getMvcResultOfDelete(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -173,7 +198,7 @@ class HouseControllerTest {
         HouseRequest houseRequest = createValidHouseRequest("house0", 3);
 
         //when
-        var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
+        var result = getMvcResultOfDelete(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
         assertEquals(422, result.getResponse().getStatus());
@@ -183,6 +208,14 @@ class HouseControllerTest {
 
     private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
         houseRepository.save(houseInternalEntity);
+    }
+
+    private void putIntoHouseDatabase(List<HouseInternalEntity> houseInternalEntity) {
+        houseRepository.saveAll(houseInternalEntity);
+    }
+
+    private int getHouseId(String houseNumber) {
+        return houseRepository.findByHouseNumber(houseNumber).getId();
     }
 
 }

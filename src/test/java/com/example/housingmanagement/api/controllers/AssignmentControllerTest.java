@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,6 +48,7 @@ class AssignmentControllerTest {
         //given
         putIntoHouseDatabase(aPartiallyOccupiedHouse("house1", 3, 1));
         putIntoHouseDatabase(aPartiallyOccupiedHouse("house2", 3, 1));
+        putIntoHouseDatabase(aPartiallyOccupiedHouse("house1", 3, 1));
 
         OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, houseRepository.findByHouseNumber("house1"));
         OccupantInternalEntity occupant2 = new OccupantInternalEntity(now, "Bret", "Miller", Gender.MALE, houseRepository.findByHouseNumber("house1"));
@@ -64,6 +66,14 @@ class AssignmentControllerTest {
         assertEquals(2, listOfLastNames.size());
         assertTrue(listOfFirstNames.contains("John") && listOfFirstNames.contains("Bret"));
         assertTrue(listOfLastNames.contains("Smith") && listOfLastNames.contains("Miller"));
+    }
+
+    private OccupantInternalEntity getOccupant2() {
+        return new OccupantInternalEntity(now, "Bret", "Miller", Gender.MALE, houseRepository.findByHouseNumber("house1"));
+    }
+
+    private OccupantInternalEntity getOccupant1() {
+        return new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, houseRepository.findByHouseNumber("house1"));
     }
 
     @Test
@@ -210,7 +220,7 @@ class AssignmentControllerTest {
         List<String> occupantInternalEntityFirstNames = getFirstNames();
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertFalse(occupantInternalEntityFirstNames.contains("Kate"));
         assertEquals(1, updatedHouse.getCurrentCapacity());
     }

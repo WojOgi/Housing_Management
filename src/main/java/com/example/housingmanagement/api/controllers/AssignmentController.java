@@ -95,6 +95,10 @@ public class AssignmentController {
             return ResponseEntity.unprocessableEntity().build();
         }
 
+
+
+
+
         if (houseHasSpareCapacity(assignmentRequest)) {
             //check if occupant was homeless - in such case should use /assign endpoint
             if (!occupantHasAHouse(assignmentRequest)) {
@@ -119,6 +123,10 @@ public class AssignmentController {
                 return ResponseEntity.ok().build();
             }
         }
+
+
+
+
         return ResponseEntity.unprocessableEntity().build();
     }
 

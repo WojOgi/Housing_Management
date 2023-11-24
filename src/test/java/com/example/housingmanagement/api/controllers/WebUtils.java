@@ -40,7 +40,7 @@ public class WebUtils {
                 .content(objectMapper.writeValueAsString(houseRequest))).andExpect(expectedResult).andReturn();
     }
 
-    public static MvcResult getMvcResultOfDELETE(HouseRequest houseRequest, String url, ResultMatcher expectedResult) throws Exception {
+    public static MvcResult getMvcResultOfDelete(HouseRequest houseRequest, String url, ResultMatcher expectedResult) throws Exception {
         return mockMvc.perform(delete(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(houseRequest))).andExpect(expectedResult).andReturn();
     }
 
