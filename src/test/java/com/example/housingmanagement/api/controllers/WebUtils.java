@@ -1,6 +1,8 @@
 package com.example.housingmanagement.api.controllers;
 
+import com.example.housingmanagement.api.requests.AssignmentRequest;
 import com.example.housingmanagement.api.requests.HouseRequest;
+import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -11,6 +13,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @Component
 public class WebUtils {
@@ -28,7 +31,6 @@ public class WebUtils {
         return mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
     }
 
-
     public static String performGetWithId(String url, int id) throws Exception {
         return mockMvc.perform(get(url, id).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
     }
@@ -41,4 +43,21 @@ public class WebUtils {
     public static MvcResult getMvcResultOfDELETE(HouseRequest houseRequest, String url, ResultMatcher expectedResult) throws Exception {
         return mockMvc.perform(delete(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(houseRequest))).andExpect(expectedResult).andReturn();
     }
+
+    public static MvcResult getMvcResultOfPOST(OccupantRequest occupantRequest, String url, ResultMatcher expectedResult) throws Exception {
+        return mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(occupantRequest)))
+                .andExpect(expectedResult).andReturn();
+    }
+
+    public static String performGet(HouseRequest houseRequest, String url) throws Exception {
+        return mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(houseRequest)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+    }
+
+    public static MvcResult getMvcResultOfPUT(AssignmentRequest assignmentRequest, String url, ResultMatcher expectedResult) throws Exception {
+        return mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(assignmentRequest)))
+                .andExpect(expectedResult).andReturn();
+    }
+
+
 }

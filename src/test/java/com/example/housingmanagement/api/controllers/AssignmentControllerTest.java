@@ -6,26 +6,20 @@ import com.example.housingmanagement.api.dbentities.Gender;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.requests.AssignmentRequest;
-import com.example.housingmanagement.api.requests.HouseRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.example.housingmanagement.api.controllers.DataBaseTestUtils.*;
+import static com.example.housingmanagement.api.controllers.WebUtils.getMvcResultOfPUT;
+import static com.example.housingmanagement.api.controllers.WebUtils.performGet;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -34,16 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AssignmentControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
     private OccupantRepositoryJPA occupantRepository;
 
     @Autowired
     private HouseRepositoryJPA houseRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private final LocalDateTime now = LocalDateTime.now();
 
@@ -398,13 +386,5 @@ class AssignmentControllerTest {
                 .toList();
     }
 
-    private String performGet(HouseRequest houseRequest, String url) throws Exception {
-        return mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(houseRequest)))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-    }
 
-    private MvcResult getMvcResultOfPUT(AssignmentRequest assignmentRequest, String url, ResultMatcher expectedResult) throws Exception {
-        return mockMvc.perform(put(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(assignmentRequest)))
-                .andExpect(expectedResult).andReturn();
-    }
 }
