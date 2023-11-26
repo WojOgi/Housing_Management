@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -86,7 +87,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
 
         //then
-        assertEquals(200, result.getResponse().getStatus());
+        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
         assertNotNull(updatedOccupant.getHouseInternalEntity());
         assertEquals(3, updatedHouse.getCurrentCapacity());
         assertEquals(updatedHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
@@ -107,7 +108,7 @@ class AssignmentControllerTest {
         var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertFalse(houseRepository.existsByHouseNumber("house1"));
         assertNull(occupantRepository.findByFirstNameAndLastName("John", "Smith").getHouseInternalEntity());
     }
@@ -129,7 +130,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertEquals(2, updatedHouse.getCurrentCapacity());
     }
 
@@ -153,7 +154,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertNull(updatedOccupant.getHouseInternalEntity());
         assertEquals(3, updatedHouse.getCurrentCapacity());
     }
@@ -182,7 +183,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedHouse = getUpdatedHouse(house1.getHouseNumber());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertNotNull(updatedOccupant.getHouseInternalEntity());
         assertEquals(1, updatedHouse.getCurrentCapacity());
         assertNotEquals(updatedHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
@@ -210,7 +211,7 @@ class AssignmentControllerTest {
         List<String> occupantInternalEntityFirstNames = getFirstNames();
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertFalse(occupantInternalEntityFirstNames.contains("Kate"));
         assertEquals(1, updatedHouse.getCurrentCapacity());
     }
@@ -240,7 +241,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedTargetHouse = getUpdatedHouse(targetHouse.getHouseNumber());
 
         //then
-        assertEquals(200, result.getResponse().getStatus());
+        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
         assertEquals(0, updatedSourceHouse.getCurrentCapacity());
         assertEquals(2, updatedTargetHouse.getCurrentCapacity());
     }
@@ -267,7 +268,7 @@ class AssignmentControllerTest {
         OccupantInternalEntity updatedOccupant = getUpdatedOccupant(occupantToMove.getFirstName(), occupantToMove.getLastName());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertEquals(sourceHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
         assertEquals(1, updatedSourceHouse.getCurrentCapacity());
     }
@@ -297,7 +298,7 @@ class AssignmentControllerTest {
         OccupantInternalEntity updatedOccupant = getUpdatedOccupant(occupantToMove.getFirstName(), occupantToMove.getLastName());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertEquals(sourceHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
         assertEquals(1, updatedSourceHouse.getCurrentCapacity());
         assertEquals(3, updatedTargetHouse.getCurrentCapacity());
@@ -331,7 +332,7 @@ class AssignmentControllerTest {
         OccupantInternalEntity updatedOccupantToStay = getUpdatedOccupant(occupantToStay.getFirstName(), occupantToStay.getLastName());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertEquals(sourceHouse.getHouseNumber(), updatedOccupantToMove.getHouseInternalEntity().getHouseNumber());
         assertEquals(targetHouse.getHouseNumber(), updatedOccupantToStay.getHouseInternalEntity().getHouseNumber());
         assertEquals(1, updatedSourceHouse.getCurrentCapacity());
@@ -359,7 +360,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedHouse2 = getUpdatedHouse(house2.getHouseNumber());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertTrue(occupantRepository.findAll().isEmpty());
         assertEquals(1, updatedHouse1.getCurrentCapacity());
         assertEquals(1, updatedHouse2.getCurrentCapacity());
