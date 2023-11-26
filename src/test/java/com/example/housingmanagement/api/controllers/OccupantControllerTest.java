@@ -5,7 +5,6 @@ import com.example.housingmanagement.api.dbentities.Gender;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,17 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.List;
 
 import static com.example.housingmanagement.api.controllers.DataBaseTestUtils.*;
+import static com.example.housingmanagement.api.controllers.WebUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -31,13 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class OccupantControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
     private OccupantRepositoryJPA occupantRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
@@ -130,21 +118,6 @@ class OccupantControllerTest {
         //then
         Assertions.assertEquals(422, result.getResponse().getStatus());
         assertTrue(occupantRepository.findAll().isEmpty());
-    }
-
-    private String performGetWithId(String url, int id) throws Exception {
-        return mockMvc.perform(get(url, id)
-                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-    }
-
-    private MvcResult getMvcResultOfPOST(OccupantRequest occupantRequest, String url, ResultMatcher expectedResult) throws Exception {
-        return mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(occupantRequest)))
-                .andExpect(expectedResult).andReturn();
-    }
-
-    private String performGet(String url) throws Exception {
-        return mockMvc.perform(get(url)
-                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
     }
 
     private void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity) {

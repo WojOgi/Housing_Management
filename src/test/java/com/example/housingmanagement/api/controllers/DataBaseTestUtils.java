@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 
 
 @Component
@@ -22,6 +23,15 @@ public class DataBaseTestUtils {
     private static final LocalDateTime now = LocalDateTime.now();
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    public static String withValidHouseName() {
+        String prefix = "G-";
+        Random random = new Random();
+        int suffix = random.nextInt(1000, 1999);
+        String suffixString = Integer.toString(suffix);
+
+        return prefix + suffixString;
+    }
 
 
     public static List<HouseResponse> getHouseResponseList(String responseContent) throws JsonProcessingException {
@@ -38,8 +48,8 @@ public class DataBaseTestUtils {
         return new HouseRequest(houseNumber, maxCapacity);
     }
 
-    public static HouseInternalEntity anEmptyHouse(String houseNumber, int maxCapacity) {
-        return new HouseInternalEntity(now, houseNumber, maxCapacity, 0);
+    public static HouseInternalEntity anEmptyHouse(String houseNumber) {
+        return new HouseInternalEntity(now, houseNumber, 3, 0);
     }
 
     public static HouseInternalEntity aFullHouse(String houseNumber, int maxCapacity) {
