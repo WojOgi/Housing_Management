@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -83,7 +84,7 @@ class OccupantControllerTest {
         var result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isCreated());
 
         //then
-        Assertions.assertEquals(201, result.getResponse().getStatus());
+        Assertions.assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
         assertEquals(occupantRepository.findAll().get(0).getFirstName(), "Barry");
         assertEquals(occupantRepository.findAll().get(0).getLastName(), "White");
         assertEquals(occupantRepository.findAll().get(0).getGender(), Gender.MALE);
@@ -102,7 +103,7 @@ class OccupantControllerTest {
         var result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isUnprocessableEntity());
 
         //then
-        Assertions.assertEquals(422, result.getResponse().getStatus());
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertEquals(1, occupantRepository.findAll().size());
     }
 
@@ -116,7 +117,7 @@ class OccupantControllerTest {
         var result = getMvcResultOfPOST(occupantRequest, "/occupants", status().isUnprocessableEntity());
 
         //then
-        Assertions.assertEquals(422, result.getResponse().getStatus());
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertTrue(occupantRepository.findAll().isEmpty());
     }
 

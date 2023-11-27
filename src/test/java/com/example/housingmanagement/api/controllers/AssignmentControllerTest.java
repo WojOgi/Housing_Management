@@ -1,7 +1,5 @@
 package com.example.housingmanagement.api.controllers;
 
-import com.example.housingmanagement.api.HouseRepositoryJPA;
-import com.example.housingmanagement.api.OccupantRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.Gender;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
@@ -9,9 +7,9 @@ import com.example.housingmanagement.api.requests.AssignmentRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,31 +25,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class AssignmentControllerTest {
 
-    @Autowired
-    private OccupantRepositoryJPA occupantRepository;
-
-    @Autowired
-    private HouseRepositoryJPA houseRepository;
-
     private final LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void setUp() {
-        occupantRepository.deleteAll();
-        houseRepository.deleteAll();
+        clearOccupantRepository();
+        clearHouseRepository();
     }
 
     @Test
     @DisplayName("Should return a list of occupants of a given house")
     void shouldGetAllOccupantsOfSpecificHouse() throws Exception {
         //given
-        putIntoHouseDatabase(aPartiallyOccupiedHouse("house1", 3, 1));
-        putIntoHouseDatabase(aPartiallyOccupiedHouse("house2", 3, 1));
 
-        OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, houseRepository.findByHouseNumber("house1"));
-        OccupantInternalEntity occupant2 = new OccupantInternalEntity(now, "Bret", "Miller", Gender.MALE, houseRepository.findByHouseNumber("house1"));
-        occupantRepository.save(occupant1);
-        occupantRepository.save(occupant2);
+        HouseInternalEntity house1 = aPartiallyOccupiedHouse("house1", 3, 1);
+        HouseInternalEntity house2 = aPartiallyOccupiedHouse("house2", 3, 1);
+
+        putIntoHouseDatabase(house1, house2);
+
+        OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, house1);
+        OccupantInternalEntity occupant2 = new OccupantInternalEntity(now, "Bret", "Miller", Gender.MALE, house1);
+
+        putIntoOccupantDatabase(occupant1, occupant2);
 
         //when
         String responseContent = performGet(createValidHouseRequest("house1"), "/occupants_of_house");
@@ -86,7 +81,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
 
         //then
-        assertEquals(200, result.getResponse().getStatus());
+        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
         assertNotNull(updatedOccupant.getHouseInternalEntity());
         assertEquals(3, updatedHouse.getCurrentCapacity());
         assertEquals(updatedHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
@@ -107,9 +102,9 @@ class AssignmentControllerTest {
         var result = getMvcResultOfPUT(assignmentRequest, "/occupants/assign", status().isUnprocessableEntity());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
-        assertFalse(houseRepository.existsByHouseNumber("house1"));
-        assertNull(occupantRepository.findByFirstNameAndLastName("John", "Smith").getHouseInternalEntity());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
+        assertFalse(isExistsByHouseNumber("house1"));
+        assertNull(getOccupantByFirstNameAndLastName("John", "Smith").getHouseInternalEntity());
     }
 
     @Test
@@ -129,7 +124,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertEquals(2, updatedHouse.getCurrentCapacity());
     }
 
@@ -153,7 +148,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedHouse = getUpdatedHouse("house1");
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertNull(updatedOccupant.getHouseInternalEntity());
         assertEquals(3, updatedHouse.getCurrentCapacity());
     }
@@ -162,13 +157,14 @@ class AssignmentControllerTest {
     @DisplayName("Should NOT assign an already assigned occupant to a house with spare capacity")
     void shouldNotAssignSpecificAlreadyAssignedOccupantToSpecificHouseWithNoSpareCapacity() throws Exception {
         //given
-        HouseInternalEntity house1 = new HouseInternalEntity(now, "house1", 3, 1);
-        HouseInternalEntity house2 = new HouseInternalEntity(now, "house2", 3, 1);
-        houseRepository.save(house1);
-        houseRepository.save(house2);
+        HouseInternalEntity house1 = aPartiallyOccupiedHouse("house1", 3, 1);
+        HouseInternalEntity house2 = aPartiallyOccupiedHouse("house2", 3, 1);
+
+        putIntoHouseDatabase(house1, house2);
 
         OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, house2);
-        occupantRepository.save(occupant1);
+
+        putIntoOccupantDatabase(occupant1);
 
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
@@ -182,7 +178,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedHouse = getUpdatedHouse(house1.getHouseNumber());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertNotNull(updatedOccupant.getHouseInternalEntity());
         assertEquals(1, updatedHouse.getCurrentCapacity());
         assertNotEquals(updatedHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
@@ -192,11 +188,13 @@ class AssignmentControllerTest {
     @DisplayName("Should NOT assign an unassigned occupant to a house with spare capacity if genders don't match")
     void shouldNotAssignHomelessOccupantToSpecificHouseWithSpareCapacityIfGendersDontMatch() throws Exception {
         //given
-        HouseInternalEntity house1 = new HouseInternalEntity(now, "house1", 3, 1);
-        houseRepository.save(house1);
+        HouseInternalEntity house1 = aPartiallyOccupiedHouse("house1", 3, 1);
+
+        putIntoHouseDatabase(house1);
 
         OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, house1);
-        occupantRepository.save(occupant1);
+
+        putIntoOccupantDatabase(occupant1);
 
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
@@ -210,7 +208,7 @@ class AssignmentControllerTest {
         List<String> occupantInternalEntityFirstNames = getFirstNames();
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertFalse(occupantInternalEntityFirstNames.contains("Kate"));
         assertEquals(1, updatedHouse.getCurrentCapacity());
     }
@@ -220,13 +218,14 @@ class AssignmentControllerTest {
     @DisplayName("Should move an already assigned occupant to a different house if has spare capacity and genders match")
     void shouldMoveSpecificOccupantToDifferentHouse() throws Exception {
         //given
-        HouseInternalEntity sourceHouse = new HouseInternalEntity(now, "sourceHouse", 3, 1);
-        HouseInternalEntity targetHouse = new HouseInternalEntity(now, "targetHouse", 3, 1);
-        houseRepository.save(sourceHouse);
-        houseRepository.save(targetHouse);
+        HouseInternalEntity sourceHouse = aPartiallyOccupiedHouse("sourceHouse", 3, 1);
+        HouseInternalEntity targetHouse = aPartiallyOccupiedHouse("targetHouse", 3, 1);
+
+        putIntoHouseDatabase(sourceHouse, targetHouse);
 
         OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
-        occupantRepository.save(occupantToMove);
+
+        putIntoOccupantDatabase(occupantToMove);
 
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
@@ -240,7 +239,7 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedTargetHouse = getUpdatedHouse(targetHouse.getHouseNumber());
 
         //then
-        assertEquals(200, result.getResponse().getStatus());
+        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
         assertEquals(0, updatedSourceHouse.getCurrentCapacity());
         assertEquals(2, updatedTargetHouse.getCurrentCapacity());
     }
@@ -249,11 +248,13 @@ class AssignmentControllerTest {
     @DisplayName("Should NOT move an assigned occupant to a different house if house does not exist")
     void shouldNotMoveSpecificOccupantToNonExistingHouse() throws Exception {
         //given
-        HouseInternalEntity sourceHouse = new HouseInternalEntity(now, "sourceHouse", 3, 1);
-        houseRepository.save(sourceHouse);
+        HouseInternalEntity sourceHouse = aPartiallyOccupiedHouse("sourceHouse", 3, 1);
+
+        putIntoHouseDatabase(sourceHouse);
 
         OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
-        occupantRepository.save(occupantToMove);
+
+        putIntoOccupantDatabase(occupantToMove);
 
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
@@ -267,7 +268,7 @@ class AssignmentControllerTest {
         OccupantInternalEntity updatedOccupant = getUpdatedOccupant(occupantToMove.getFirstName(), occupantToMove.getLastName());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertEquals(sourceHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
         assertEquals(1, updatedSourceHouse.getCurrentCapacity());
     }
@@ -276,13 +277,14 @@ class AssignmentControllerTest {
     @DisplayName("Should NOT move an assigned occupant to a different house if house does NOT have spare capacity but genders match")
     void shouldNotMoveSpecificOccupantToExistingHouseWithoutSpareCapacity() throws Exception {
         //given
-        HouseInternalEntity sourceHouse = new HouseInternalEntity(now, "sourceHouse", 3, 1);
-        HouseInternalEntity targetHouse = new HouseInternalEntity(now, "targetHouse", 3, 3);
-        houseRepository.save(sourceHouse);
-        houseRepository.save(targetHouse);
+        HouseInternalEntity sourceHouse = aPartiallyOccupiedHouse("sourceHouse", 3, 1);
+        HouseInternalEntity targetHouse = aPartiallyOccupiedHouse("targetHouse", 3, 3);
+
+        putIntoHouseDatabase(sourceHouse, targetHouse);
 
         OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
-        occupantRepository.save(occupantToMove);
+
+        putIntoOccupantDatabase(occupantToMove);
 
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
@@ -297,7 +299,7 @@ class AssignmentControllerTest {
         OccupantInternalEntity updatedOccupant = getUpdatedOccupant(occupantToMove.getFirstName(), occupantToMove.getLastName());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertEquals(sourceHouse.getHouseNumber(), updatedOccupant.getHouseInternalEntity().getHouseNumber());
         assertEquals(1, updatedSourceHouse.getCurrentCapacity());
         assertEquals(3, updatedTargetHouse.getCurrentCapacity());
@@ -307,15 +309,15 @@ class AssignmentControllerTest {
     @DisplayName("Should NOT move an assigned occupant to a different house even though it has spare capacity but genders do NOT match")
     void shouldNotMoveSpecificOccupantToExistingHouseIfGendersDontMatch() throws Exception {
         //given
-        HouseInternalEntity sourceHouse = new HouseInternalEntity(now, "sourceHouse", 3, 1);
-        HouseInternalEntity targetHouse = new HouseInternalEntity(now, "targetHouse", 3, 1);
-        houseRepository.save(sourceHouse);
-        houseRepository.save(targetHouse);
+        HouseInternalEntity sourceHouse = aPartiallyOccupiedHouse("sourceHouse", 3, 1);
+        HouseInternalEntity targetHouse = aPartiallyOccupiedHouse("targetHouse", 3, 1);
+
+        putIntoHouseDatabase(sourceHouse, targetHouse);
 
         OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
         OccupantInternalEntity occupantToStay = new OccupantInternalEntity(now, "Brian", "Greene", Gender.MALE, targetHouse);
-        occupantRepository.save(occupantToMove);
-        occupantRepository.save(occupantToStay);
+
+        putIntoOccupantDatabase(occupantToMove, occupantToStay);
 
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
@@ -331,7 +333,7 @@ class AssignmentControllerTest {
         OccupantInternalEntity updatedOccupantToStay = getUpdatedOccupant(occupantToStay.getFirstName(), occupantToStay.getLastName());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertEquals(sourceHouse.getHouseNumber(), updatedOccupantToMove.getHouseInternalEntity().getHouseNumber());
         assertEquals(targetHouse.getHouseNumber(), updatedOccupantToStay.getHouseInternalEntity().getHouseNumber());
         assertEquals(1, updatedSourceHouse.getCurrentCapacity());
@@ -342,10 +344,10 @@ class AssignmentControllerTest {
     @DisplayName("Should NOT move an unassigned occupant to a different house even though it has spare capacity and genders match")
     void shouldNotMoveUnassignedSpecificOccupantToDifferentHouse() throws Exception {
         //given
-        HouseInternalEntity house1 = new HouseInternalEntity(now, "house1", 3, 1);
-        HouseInternalEntity house2 = new HouseInternalEntity(now, "house2", 3, 1);
-        houseRepository.save(house1);
-        houseRepository.save(house2);
+        HouseInternalEntity house1 = aPartiallyOccupiedHouse("house1", 3, 1);
+        HouseInternalEntity house2 = aPartiallyOccupiedHouse("house2", 3, 1);
+
+        putIntoHouseDatabase(house1, house2);
 
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
@@ -359,32 +361,9 @@ class AssignmentControllerTest {
         HouseInternalEntity updatedHouse2 = getUpdatedHouse(house2.getHouseNumber());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
-        assertTrue(occupantRepository.findAll().isEmpty());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
+        assertTrue(occupantRepositoryIsEmpty());
         assertEquals(1, updatedHouse1.getCurrentCapacity());
         assertEquals(1, updatedHouse2.getCurrentCapacity());
     }
-
-    private HouseInternalEntity getUpdatedHouse(String houseNumber) {
-        return houseRepository.findByHouseNumber(houseNumber);
-    }
-
-    private OccupantInternalEntity getUpdatedOccupant(String firstName, String lastName) {
-        return occupantRepository.findByFirstNameAndLastName(firstName, lastName);
-    }
-
-    private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
-        houseRepository.save(houseInternalEntity);
-    }
-
-    private void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity) {
-        occupantRepository.save(occupantInternalEntity);
-    }
-
-    private List<String> getFirstNames() {
-        return occupantRepository.findAll().stream().map(OccupantInternalEntity::getFirstName)
-                .toList();
-    }
-
-
 }

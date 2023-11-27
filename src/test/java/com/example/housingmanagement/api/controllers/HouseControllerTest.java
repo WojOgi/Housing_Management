@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -72,7 +73,7 @@ class HouseControllerTest {
         putIntoHouseDatabase(anEmptyHouse("house1"));
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
-        int id = houseRepository.findByHouseNumber("house1").getId();
+        int id = getIdForHouse("house1");
 
         //when
         HouseResponse houseResponse = getHouseResponse(performGetWithId("/houses/{id}", id));
@@ -92,8 +93,8 @@ class HouseControllerTest {
         var result = getMvcResultOfPOST(houseRequest, "/houses", status().isCreated());
 
         //then
-        Assertions.assertEquals(201, result.getResponse().getStatus());
-        assertEquals(houseRepository.findAll().get(0).getHouseNumber(), "house1");
+        Assertions.assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
+        assertEquals(getHouseNumber(0), "house1");
     }
 
     @Test
@@ -110,8 +111,8 @@ class HouseControllerTest {
         var result = getMvcResultOfPOST(houseRequest, "/houses", status().isCreated());
 
         //then
-        Assertions.assertEquals(201, result.getResponse().getStatus());
-        assertEquals(houseRepository.findAll().get(2).getHouseNumber(), "house2");
+        Assertions.assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
+        assertEquals(getHouseNumber(2), "house2");
 
     }
 
@@ -129,7 +130,7 @@ class HouseControllerTest {
         var result = getMvcResultOfPOST(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
-        Assertions.assertEquals(422, result.getResponse().getStatus());
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
     }
 
     @Test
@@ -144,7 +145,7 @@ class HouseControllerTest {
         var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isOk());
 
         //then
-        assertEquals(200, result.getResponse().getStatus());
+        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
         assertTrue(houseRepository.findAll().isEmpty());
     }
 
@@ -160,7 +161,7 @@ class HouseControllerTest {
         var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertFalse(houseRepository.findAll().isEmpty());
     }
 
@@ -176,8 +177,16 @@ class HouseControllerTest {
         var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertFalse(houseRepository.findAll().isEmpty());
+    }
+
+    private String getHouseNumber(int index) {
+        return houseRepository.findAll().get(index).getHouseNumber();
+    }
+
+    private int getIdForHouse(String houseNumber) {
+        return houseRepository.findByHouseNumber(houseNumber).getId();
     }
 
 
