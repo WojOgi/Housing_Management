@@ -73,7 +73,7 @@ class HouseControllerTest {
         putIntoHouseDatabase(anEmptyHouse("house1"));
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
-        int id = houseRepository.findByHouseNumber("house1").getId();
+        int id = getIdForHouse("house1");
 
         //when
         HouseResponse houseResponse = getHouseResponse(performGetWithId("/houses/{id}", id));
@@ -94,7 +94,7 @@ class HouseControllerTest {
 
         //then
         Assertions.assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
-        assertEquals(houseRepository.findAll().get(0).getHouseNumber(), "house1");
+        assertEquals(getHouseNumber(0), "house1");
     }
 
     @Test
@@ -112,7 +112,7 @@ class HouseControllerTest {
 
         //then
         Assertions.assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
-        assertEquals(houseRepository.findAll().get(2).getHouseNumber(), "house2");
+        assertEquals(getHouseNumber(2), "house2");
 
     }
 
@@ -179,6 +179,14 @@ class HouseControllerTest {
         //then
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
         assertFalse(houseRepository.findAll().isEmpty());
+    }
+
+    private String getHouseNumber(int index) {
+        return houseRepository.findAll().get(index).getHouseNumber();
+    }
+
+    private int getIdForHouse(String houseNumber) {
+        return houseRepository.findByHouseNumber(houseNumber).getId();
     }
 
 
