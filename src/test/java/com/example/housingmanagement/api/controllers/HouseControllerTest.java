@@ -1,20 +1,18 @@
 package com.example.housingmanagement.api.controllers;
 
-import com.example.housingmanagement.api.HouseRepositoryJPA;
-import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
+import static com.example.housingmanagement.api.testutils.DataBaseTestUtils.*;
 import static com.example.housingmanagement.api.testutils.MappingTestUtils.*;
 import static com.example.housingmanagement.api.testutils.WebUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,12 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class HouseControllerTest {
 
-    @Autowired
-    private HouseRepositoryJPA houseRepository;
-
     @BeforeEach
     void setUp() {
-        houseRepository.deleteAll();
+        clearHouseRepository();
     }
 
     @Test
@@ -146,7 +141,7 @@ class HouseControllerTest {
 
         //then
         assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
-        assertTrue(houseRepository.findAll().isEmpty());
+        assertTrue(houseRepositoryIsEmpty());
     }
 
     @Test
@@ -162,7 +157,7 @@ class HouseControllerTest {
 
         //then
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
-        assertFalse(houseRepository.findAll().isEmpty());
+        assertFalse(houseRepositoryIsEmpty());
     }
 
     @Test
@@ -178,20 +173,6 @@ class HouseControllerTest {
 
         //then
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
-        assertFalse(houseRepository.findAll().isEmpty());
+        assertFalse(houseRepositoryIsEmpty());
     }
-
-    private String getHouseNumber(int index) {
-        return houseRepository.findAll().get(index).getHouseNumber();
-    }
-
-    private int getIdForHouse(String houseNumber) {
-        return houseRepository.findByHouseNumber(houseNumber).getId();
-    }
-
-
-    private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
-        houseRepository.save(houseInternalEntity);
-    }
-
 }

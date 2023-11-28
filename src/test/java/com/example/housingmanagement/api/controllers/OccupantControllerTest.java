@@ -1,21 +1,20 @@
 package com.example.housingmanagement.api.controllers;
 
-import com.example.housingmanagement.api.OccupantRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.Gender;
-import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
 import com.example.housingmanagement.api.requests.OccupantRequest;
 import com.example.housingmanagement.api.responses.OccupantResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
+import static com.example.housingmanagement.api.testutils.DataBaseTestUtils.*;
+import static com.example.housingmanagement.api.testutils.MappingTestUtils.getFirstNames;
 import static com.example.housingmanagement.api.testutils.MappingTestUtils.*;
 import static com.example.housingmanagement.api.testutils.WebUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,12 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class OccupantControllerTest {
 
-    @Autowired
-    private OccupantRepositoryJPA occupantRepository;
-
     @BeforeEach
     void setUp() {
-        occupantRepository.deleteAll();
+        clearOccupantRepository();
     }
 
     @Test
@@ -62,7 +58,7 @@ class OccupantControllerTest {
         putIntoOccupantDatabase(maleOccupant("John", "Smith"));
         putIntoOccupantDatabase(femaleOccupant("Sarah", "Brent"));
 
-        int id = occupantRepository.findByFirstNameAndLastName("John", "Smith").getId();
+        int id = getIdByFirstAndLastName("John", "Smith");
 
         //when
         OccupantResponse occupantResponse = getOccupantResponse(performGetWithId("/occupants/{id}", id));
@@ -85,10 +81,10 @@ class OccupantControllerTest {
 
         //then
         Assertions.assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
-        assertEquals(occupantRepository.findAll().get(0).getFirstName(), "Barry");
-        assertEquals(occupantRepository.findAll().get(0).getLastName(), "White");
-        assertEquals(occupantRepository.findAll().get(0).getGender(), Gender.MALE);
-        assertEquals(1, occupantRepository.findAll().size());
+        assertEquals(getFirstNameByIndex(0), "Barry");
+        assertEquals(getLastNameByIndex(0), "White");
+        assertEquals(getGenderByIndex(0), Gender.MALE);
+        assertEquals(1, getOccupantRepositorySize());
     }
 
     @Test
@@ -104,7 +100,7 @@ class OccupantControllerTest {
 
         //then
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
-        assertEquals(1, occupantRepository.findAll().size());
+        assertEquals(1, getOccupantRepositorySize());
     }
 
     @Test
@@ -118,10 +114,8 @@ class OccupantControllerTest {
 
         //then
         Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
-        assertTrue(occupantRepository.findAll().isEmpty());
+        assertTrue(occupantRepositoryIsEmpty());
     }
 
-    private void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity) {
-        occupantRepository.save(occupantInternalEntity);
-    }
+
 }
