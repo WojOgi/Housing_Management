@@ -16,7 +16,6 @@ public class DataBaseTestUtils {
 
     private static OccupantRepositoryJPA occupantRepository;
 
-
     private static HouseRepositoryJPA houseRepository;
 
     @Autowired
@@ -25,16 +24,10 @@ public class DataBaseTestUtils {
         DataBaseTestUtils.occupantRepository = occupantRepository;
     }
 
+    //houseRepository - related
+
     public static boolean isExistsByHouseNumber(String houseNumber) {
         return houseRepository.existsByHouseNumber(houseNumber);
-    }
-
-    public static OccupantInternalEntity getOccupantByFirstNameAndLastName(String firstName, String lastName) {
-        return occupantRepository.findByFirstNameAndLastName(firstName, lastName);
-    }
-
-    public static boolean occupantRepositoryIsEmpty() {
-        return occupantRepository.findAll().isEmpty();
     }
 
     public static boolean houseRepositoryIsEmpty() {
@@ -45,37 +38,16 @@ public class DataBaseTestUtils {
         return houseRepository.findByHouseNumber(houseNumber);
     }
 
-    public static OccupantInternalEntity getUpdatedOccupant(String firstName, String lastName) {
-        return occupantRepository.findByFirstNameAndLastName(firstName, lastName);
-    }
-
     public static void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
         houseRepository.save(houseInternalEntity);
-    }
-
-    public static void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity1, HouseInternalEntity houseInternalEntity2) {
-        houseRepository.saveAll(List.of(houseInternalEntity1, houseInternalEntity2));
-    }
-
-    public static void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity) {
-        occupantRepository.save(occupantInternalEntity);
-    }
-
-    public static List<String> getFirstNames() {
-        return occupantRepository.findAll().stream().map(OccupantInternalEntity::getFirstName)
-                .toList();
     }
 
     public static void clearHouseRepository() {
         houseRepository.deleteAll();
     }
 
-    public static void clearOccupantRepository() {
-        occupantRepository.deleteAll();
-    }
-
-    public static void putIntoOccupantDatabase(OccupantInternalEntity occupant1, OccupantInternalEntity occupant2) {
-        occupantRepository.saveAll(List.of(occupant1, occupant2));
+    public static void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity1, HouseInternalEntity houseInternalEntity2) {
+        houseRepository.saveAll(List.of(houseInternalEntity1, houseInternalEntity2));
     }
 
     public static String getHouseNumber(int index) {
@@ -84,6 +56,37 @@ public class DataBaseTestUtils {
 
     public static int getIdForHouse(String houseNumber) {
         return houseRepository.findByHouseNumber(houseNumber).getId();
+    }
+
+    //occupantRepository - related
+
+    public static OccupantInternalEntity getUpdatedOccupant(String firstName, String lastName) {
+        return occupantRepository.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    public static void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity) {
+        occupantRepository.save(occupantInternalEntity);
+    }
+
+    public static OccupantInternalEntity getOccupantByFirstNameAndLastName(String firstName, String lastName) {
+        return occupantRepository.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    public static boolean occupantRepositoryIsEmpty() {
+        return occupantRepository.findAll().isEmpty();
+    }
+
+    public static List<String> getFirstNames() {
+        return occupantRepository.findAll().stream().map(OccupantInternalEntity::getFirstName)
+                .toList();
+    }
+
+    public static void clearOccupantRepository() {
+        occupantRepository.deleteAll();
+    }
+
+    public static void putIntoOccupantDatabase(OccupantInternalEntity occupant1, OccupantInternalEntity occupant2) {
+        occupantRepository.saveAll(List.of(occupant1, occupant2));
     }
 
     public static int getIdByFirstAndLastName(String firstName, String lastName) {

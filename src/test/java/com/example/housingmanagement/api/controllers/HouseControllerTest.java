@@ -13,7 +13,8 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static com.example.housingmanagement.api.testutils.DataBaseTestUtils.*;
-import static com.example.housingmanagement.api.testutils.MappingTestUtils.*;
+import static com.example.housingmanagement.api.testutils.ResponseMapperTestUtils.*;
+import static com.example.housingmanagement.api.testutils.EntityAndRequestCreatorTestUtils.*;
 import static com.example.housingmanagement.api.testutils.WebUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
