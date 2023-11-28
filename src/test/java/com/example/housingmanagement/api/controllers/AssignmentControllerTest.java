@@ -49,7 +49,6 @@ class AssignmentControllerTest {
         occupant1.setHouseInternalEntity(house1);
         occupant2.setHouseInternalEntity(house1);
 
-        //and
         putIntoOccupantDatabase(occupant1, occupant2);
 
         //when
@@ -177,7 +176,6 @@ class AssignmentControllerTest {
 
         occupant1.setHouseInternalEntity(house2);
 
-        //and
         putIntoOccupantDatabase(occupant1);
 
         //and
@@ -212,7 +210,6 @@ class AssignmentControllerTest {
 
         occupant1.setHouseInternalEntity(house1);
 
-        //and
         putIntoOccupantDatabase(occupant1);
 
         //and
@@ -248,7 +245,6 @@ class AssignmentControllerTest {
 
         occupantToMove.setHouseInternalEntity(sourceHouse);
 
-        //and
         putIntoOccupantDatabase(occupantToMove);
 
         //and
@@ -282,7 +278,6 @@ class AssignmentControllerTest {
 
         occupantToMove.setHouseInternalEntity(sourceHouse);
 
-        //and
         putIntoOccupantDatabase(occupantToMove);
 
         //and
@@ -317,7 +312,6 @@ class AssignmentControllerTest {
 
         occupantToMove.setHouseInternalEntity(sourceHouse);
 
-        //and
         putIntoOccupantDatabase(occupantToMove);
 
         //and
@@ -356,7 +350,6 @@ class AssignmentControllerTest {
         occupantToMove.setHouseInternalEntity(sourceHouse);
         occupantToStay.setHouseInternalEntity(targetHouse);
 
-        //and
         putIntoOccupantDatabase(occupantToMove, occupantToStay);
 
         //and
