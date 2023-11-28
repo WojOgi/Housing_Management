@@ -1,7 +1,5 @@
-package com.example.housingmanagement.api.controllers;
+package com.example.housingmanagement.api.testutils;
 
-import com.example.housingmanagement.api.HouseRepositoryJPA;
-import com.example.housingmanagement.api.OccupantRepositoryJPA;
 import com.example.housingmanagement.api.dbentities.Gender;
 import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.dbentities.OccupantInternalEntity;
@@ -12,90 +10,15 @@ import com.example.housingmanagement.api.responses.OccupantResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 
-
-@Component
-public class DataBaseTestUtils {
+public class MappingTestUtils {
 
     private static final LocalDateTime now = LocalDateTime.now();
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    private static OccupantRepositoryJPA occupantRepository;
-
-
-    private static HouseRepositoryJPA houseRepository;
-
-    @Autowired
-    private DataBaseTestUtils(OccupantRepositoryJPA occupantRepository, HouseRepositoryJPA houseRepository) {
-        DataBaseTestUtils.houseRepository = houseRepository;
-        DataBaseTestUtils.occupantRepository = occupantRepository;
-    }
-
-    public static boolean isExistsByHouseNumber(String houseNumber) {
-        return houseRepository.existsByHouseNumber(houseNumber);
-    }
-
-    public static OccupantInternalEntity getOccupantByFirstNameAndLastName(String firstName, String lastName) {
-        return occupantRepository.findByFirstNameAndLastName(firstName, lastName);
-    }
-
-    public static boolean occupantRepositoryIsEmpty() {
-        return occupantRepository.findAll().isEmpty();
-    }
-
-    public static HouseInternalEntity getUpdatedHouse(String houseNumber) {
-        return houseRepository.findByHouseNumber(houseNumber);
-    }
-
-    public static OccupantInternalEntity getUpdatedOccupant(String firstName, String lastName) {
-        return occupantRepository.findByFirstNameAndLastName(firstName, lastName);
-    }
-
-    public static void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
-        houseRepository.save(houseInternalEntity);
-    }
-
-    public static void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity1, HouseInternalEntity houseInternalEntity2) {
-        houseRepository.saveAll(List.of(houseInternalEntity1, houseInternalEntity2));
-    }
-
-    public static void putIntoOccupantDatabase(OccupantInternalEntity occupantInternalEntity) {
-        occupantRepository.save(occupantInternalEntity);
-    }
-
-    public static List<String> getFirstNames() {
-        return occupantRepository.findAll().stream().map(OccupantInternalEntity::getFirstName)
-                .toList();
-    }
-
-    public static void clearHouseRepository() {
-        houseRepository.deleteAll();
-    }
-
-    public static void clearOccupantRepository() {
-        occupantRepository.deleteAll();
-    }
-
-    public static void putIntoOccupantDatabase(OccupantInternalEntity occupant1, OccupantInternalEntity occupant2) {
-        occupantRepository.saveAll(List.of(occupant1, occupant2));
-    }
-
-    public static String withValidHouseName() {
-        String prefix = "G-";
-        Random random = new Random();
-        int suffix = random.nextInt(1000, 1999);
-        String suffixString = Integer.toString(suffix);
-
-        return prefix + suffixString;
-    }
-
 
     public static List<HouseResponse> getHouseResponseList(String responseContent) throws JsonProcessingException {
         return objectMapper.readValue(responseContent, new TypeReference<>() {
@@ -166,4 +89,6 @@ public class DataBaseTestUtils {
     public static HouseRequest createValidHouseRequest(String houseNumber) {
         return new HouseRequest(houseNumber);
     }
+
+
 }

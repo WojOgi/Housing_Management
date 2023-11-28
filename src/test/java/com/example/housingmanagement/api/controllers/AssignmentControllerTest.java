@@ -14,9 +14,11 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.example.housingmanagement.api.controllers.DataBaseTestUtils.*;
-import static com.example.housingmanagement.api.controllers.WebUtils.getMvcResultOfPUT;
-import static com.example.housingmanagement.api.controllers.WebUtils.performGet;
+import static com.example.housingmanagement.api.testutils.DataBaseTestUtils.getFirstNames;
+import static com.example.housingmanagement.api.testutils.DataBaseTestUtils.*;
+import static com.example.housingmanagement.api.testutils.MappingTestUtils.*;
+import static com.example.housingmanagement.api.testutils.WebUtils.getMvcResultOfPUT;
+import static com.example.housingmanagement.api.testutils.WebUtils.performGet;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

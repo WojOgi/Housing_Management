@@ -1,4 +1,4 @@
-package com.example.housingmanagement.api.controllers;
+package com.example.housingmanagement.api.testutils;
 
 import com.example.housingmanagement.api.requests.AssignmentRequest;
 import com.example.housingmanagement.api.requests.HouseRequest;
@@ -21,7 +21,6 @@ public class WebUtils {
     private static MockMvc mockMvc;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
 
 
     @Autowired

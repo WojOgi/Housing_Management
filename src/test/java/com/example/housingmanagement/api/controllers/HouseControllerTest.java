@@ -15,8 +15,8 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-import static com.example.housingmanagement.api.controllers.DataBaseTestUtils.*;
-import static com.example.housingmanagement.api.controllers.WebUtils.*;
+import static com.example.housingmanagement.api.testutils.MappingTestUtils.*;
+import static com.example.housingmanagement.api.testutils.WebUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -169,7 +169,7 @@ class HouseControllerTest {
     @DisplayName("Should NOT delete a house if the house exists in the database but is occupied")
     public void shouldNotDeleteSpecificHouseWhenItDoesExistsInDbButIsOccupied() throws Exception {
         //given
-        putIntoHouseDatabase(DataBaseTestUtils.aPartiallyOccupiedHouse("house0", 3, 2));
+        putIntoHouseDatabase(aPartiallyOccupiedHouse("house0", 3, 2));
 
         HouseRequest houseRequest = createValidHouseRequest("house0", 3);
 
