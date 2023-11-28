@@ -20,6 +20,10 @@ public class EntityAndRequestCreatorTestUtils {
         return new HouseRequest(houseNumber);
     }
 
+    public static OccupantRequest createValidOccupantRequest(String firstName, String lastName, Gender gender) {
+        return new OccupantRequest(firstName, lastName, gender);
+    }
+
     public static HouseInternalEntity anEmptyHouse(String houseNumber) {
         return new HouseInternalEntity(now, houseNumber, 3, 0);
     }
@@ -38,10 +42,6 @@ public class EntityAndRequestCreatorTestUtils {
 
     public static OccupantInternalEntity femaleOccupant(String firstName, String lastName) {
         return new OccupantInternalEntity(now, firstName, lastName, Gender.FEMALE);
-    }
-
-    public static OccupantRequest createValidOccupantRequest(String firstName, String lastName, Gender gender) {
-        return new OccupantRequest(firstName, lastName, gender);
     }
 
 

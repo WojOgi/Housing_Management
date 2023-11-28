@@ -11,13 +11,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.example.housingmanagement.api.testutils.DataBaseTestUtils.getFirstNames;
 import static com.example.housingmanagement.api.testutils.DataBaseTestUtils.*;
-import static com.example.housingmanagement.api.testutils.ResponseMapperTestUtils.*;
 import static com.example.housingmanagement.api.testutils.EntityAndRequestCreatorTestUtils.*;
+import static com.example.housingmanagement.api.testutils.ResponseMapperTestUtils.getListOfFirstNames;
+import static com.example.housingmanagement.api.testutils.ResponseMapperTestUtils.getListOfLastNames;
 import static com.example.housingmanagement.api.testutils.WebUtils.getMvcResultOfPUT;
 import static com.example.housingmanagement.api.testutils.WebUtils.performGet;
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,8 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class AssignmentControllerTest {
-
-    private final LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void setUp() {
@@ -40,15 +37,19 @@ class AssignmentControllerTest {
     @DisplayName("Should return a list of occupants of a given house")
     void shouldGetAllOccupantsOfSpecificHouse() throws Exception {
         //given
-
         HouseInternalEntity house1 = aPartiallyOccupiedHouse("house1", 3, 1);
         HouseInternalEntity house2 = aPartiallyOccupiedHouse("house2", 3, 1);
 
         putIntoHouseDatabase(house1, house2);
 
-        OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, house1);
-        OccupantInternalEntity occupant2 = new OccupantInternalEntity(now, "Bret", "Miller", Gender.MALE, house1);
+        //and
+        OccupantInternalEntity occupant1 = maleOccupant("John", "Smith");
+        OccupantInternalEntity occupant2 = maleOccupant("Bret", "Miller");
 
+        occupant1.setHouseInternalEntity(house1);
+        occupant2.setHouseInternalEntity(house1);
+
+        //and
         putIntoOccupantDatabase(occupant1, occupant2);
 
         //when
@@ -70,8 +71,10 @@ class AssignmentControllerTest {
         //given
         putIntoHouseDatabase(aPartiallyOccupiedHouse("house1", 3, 2));
 
+        //and
         putIntoOccupantDatabase(maleOccupant("John", "Smith"));
 
+        //and
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
                         createValidHouseRequest("house1"),
@@ -96,6 +99,7 @@ class AssignmentControllerTest {
         //given
         putIntoOccupantDatabase(maleOccupant("John", "Smith"));
 
+        //and
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
                         createValidHouseRequest("house1"),
@@ -116,6 +120,7 @@ class AssignmentControllerTest {
         //given
         putIntoHouseDatabase(aPartiallyOccupiedHouse("house1", 3, 2));
 
+        //and
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
                         createValidHouseRequest("house1"),
@@ -137,8 +142,10 @@ class AssignmentControllerTest {
         //given
         putIntoHouseDatabase(aPartiallyOccupiedHouse("house1", 3, 3));
 
+        //and
         putIntoOccupantDatabase(maleOccupant("John", "Smith"));
 
+        //and
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
                         createValidHouseRequest("house1"),
@@ -165,10 +172,15 @@ class AssignmentControllerTest {
 
         putIntoHouseDatabase(house1, house2);
 
-        OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, house2);
+        //and
+        OccupantInternalEntity occupant1 = maleOccupant("John", "Smith");
 
+        occupant1.setHouseInternalEntity(house2);
+
+        //and
         putIntoOccupantDatabase(occupant1);
 
+        //and
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
                         createValidHouseRequest("house1"),
@@ -195,10 +207,15 @@ class AssignmentControllerTest {
 
         putIntoHouseDatabase(house1);
 
-        OccupantInternalEntity occupant1 = new OccupantInternalEntity(now, "John", "Smith", Gender.MALE, house1);
+        //and
+        OccupantInternalEntity occupant1 = maleOccupant("John", "Smith");
 
+        occupant1.setHouseInternalEntity(house1);
+
+        //and
         putIntoOccupantDatabase(occupant1);
 
+        //and
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
                         createValidHouseRequest("house1"),
@@ -226,10 +243,15 @@ class AssignmentControllerTest {
 
         putIntoHouseDatabase(sourceHouse, targetHouse);
 
-        OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
+        //and
+        OccupantInternalEntity occupantToMove = femaleOccupant("Oliwia", "Ogieglo");
 
+        occupantToMove.setHouseInternalEntity(sourceHouse);
+
+        //and
         putIntoOccupantDatabase(occupantToMove);
 
+        //and
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
                         createValidHouseRequest("targetHouse"),
@@ -255,10 +277,15 @@ class AssignmentControllerTest {
 
         putIntoHouseDatabase(sourceHouse);
 
-        OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
+        //and
+        OccupantInternalEntity occupantToMove = femaleOccupant("Oliwia", "Ogieglo");
 
+        occupantToMove.setHouseInternalEntity(sourceHouse);
+
+        //and
         putIntoOccupantDatabase(occupantToMove);
 
+        //and
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
                         createValidHouseRequest("targetHouse"),
@@ -285,10 +312,15 @@ class AssignmentControllerTest {
 
         putIntoHouseDatabase(sourceHouse, targetHouse);
 
-        OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
+        //and
+        OccupantInternalEntity occupantToMove = femaleOccupant("Oliwia", "Ogieglo");
 
+        occupantToMove.setHouseInternalEntity(sourceHouse);
+
+        //and
         putIntoOccupantDatabase(occupantToMove);
 
+        //and
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
                         createValidHouseRequest("targetHouse"),
@@ -317,11 +349,17 @@ class AssignmentControllerTest {
 
         putIntoHouseDatabase(sourceHouse, targetHouse);
 
-        OccupantInternalEntity occupantToMove = new OccupantInternalEntity(now, "Oliwia", "Ogieglo", Gender.FEMALE, sourceHouse);
-        OccupantInternalEntity occupantToStay = new OccupantInternalEntity(now, "Brian", "Greene", Gender.MALE, targetHouse);
+        //and
+        OccupantInternalEntity occupantToMove = femaleOccupant("Oliwia", "Ogieglo");
+        OccupantInternalEntity occupantToStay = maleOccupant("Brian", "Greene");
 
+        occupantToMove.setHouseInternalEntity(sourceHouse);
+        occupantToStay.setHouseInternalEntity(targetHouse);
+
+        //and
         putIntoOccupantDatabase(occupantToMove, occupantToStay);
 
+        //and
         AssignmentRequest assignmentRequest =
                 new AssignmentRequest(
                         createValidHouseRequest("targetHouse"),
