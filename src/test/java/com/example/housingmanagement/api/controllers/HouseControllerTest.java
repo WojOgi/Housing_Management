@@ -1,21 +1,22 @@
 package com.example.housingmanagement.api.controllers;
 
-import com.example.housingmanagement.api.HouseRepositoryJPA;
-import com.example.housingmanagement.api.dbentities.HouseInternalEntity;
 import com.example.housingmanagement.api.requests.HouseRequest;
 import com.example.housingmanagement.api.responses.HouseResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
-import static com.example.housingmanagement.api.controllers.DataBaseTestUtils.*;
-import static com.example.housingmanagement.api.controllers.WebUtils.*;
+import static com.example.housingmanagement.api.testutils.DataBaseTestUtils.*;
+import static com.example.housingmanagement.api.testutils.EntityAndRequestCreatorTestUtils.*;
+import static com.example.housingmanagement.api.testutils.ResponseMapperTestUtils.getHouseResponse;
+import static com.example.housingmanagement.api.testutils.ResponseMapperTestUtils.getHouseResponseList;
+import static com.example.housingmanagement.api.testutils.WebUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,12 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class HouseControllerTest {
 
-    @Autowired
-    private HouseRepositoryJPA houseRepository;
-
     @BeforeEach
     void setUp() {
-        houseRepository.deleteAll();
+        clearHouseRepository();
     }
 
     @Test
@@ -72,7 +70,7 @@ class HouseControllerTest {
         putIntoHouseDatabase(anEmptyHouse("house1"));
         putIntoHouseDatabase(aFullHouse("house2", 2));
 
-        int id = houseRepository.findByHouseNumber("house1").getId();
+        int id = getIdForHouse("house1");
 
         //when
         HouseResponse houseResponse = getHouseResponse(performGetWithId("/houses/{id}", id));
@@ -92,8 +90,8 @@ class HouseControllerTest {
         var result = getMvcResultOfPOST(houseRequest, "/houses", status().isCreated());
 
         //then
-        Assertions.assertEquals(201, result.getResponse().getStatus());
-        assertEquals(houseRepository.findAll().get(0).getHouseNumber(), "house1");
+        Assertions.assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
+        assertEquals(getHouseNumber(0), "house1");
     }
 
     @Test
@@ -110,8 +108,8 @@ class HouseControllerTest {
         var result = getMvcResultOfPOST(houseRequest, "/houses", status().isCreated());
 
         //then
-        Assertions.assertEquals(201, result.getResponse().getStatus());
-        assertEquals(houseRepository.findAll().get(2).getHouseNumber(), "house2");
+        Assertions.assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus());
+        assertEquals(getHouseNumber(2), "house2");
 
     }
 
@@ -129,7 +127,7 @@ class HouseControllerTest {
         var result = getMvcResultOfPOST(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
-        Assertions.assertEquals(422, result.getResponse().getStatus());
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
     }
 
     @Test
@@ -144,8 +142,8 @@ class HouseControllerTest {
         var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isOk());
 
         //then
-        assertEquals(200, result.getResponse().getStatus());
-        assertTrue(houseRepository.findAll().isEmpty());
+        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+        assertTrue(houseRepositoryIsEmpty());
     }
 
     @Test
@@ -160,15 +158,15 @@ class HouseControllerTest {
         var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
-        assertFalse(houseRepository.findAll().isEmpty());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
+        assertFalse(houseRepositoryIsEmpty());
     }
 
     @Test
     @DisplayName("Should NOT delete a house if the house exists in the database but is occupied")
     public void shouldNotDeleteSpecificHouseWhenItDoesExistsInDbButIsOccupied() throws Exception {
         //given
-        putIntoHouseDatabase(DataBaseTestUtils.aPartiallyOccupiedHouse("house0", 3, 2));
+        putIntoHouseDatabase(aPartiallyOccupiedHouse("house0", 3, 2));
 
         HouseRequest houseRequest = createValidHouseRequest("house0", 3);
 
@@ -176,13 +174,7 @@ class HouseControllerTest {
         var result = getMvcResultOfDELETE(houseRequest, "/houses", status().isUnprocessableEntity());
 
         //then
-        assertEquals(422, result.getResponse().getStatus());
-        assertFalse(houseRepository.findAll().isEmpty());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), result.getResponse().getStatus());
+        assertFalse(houseRepositoryIsEmpty());
     }
-
-
-    private void putIntoHouseDatabase(HouseInternalEntity houseInternalEntity) {
-        houseRepository.save(houseInternalEntity);
-    }
-
 }
